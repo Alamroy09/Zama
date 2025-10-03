@@ -1,103 +1,107 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-export default function ZamaExplainer() {
-  // Quiz Data
-  const quizData = [
-    {
-      question: "What does FHE stand for?",
-      options: [
-        "Fast Homomorphic Encryption",
-        "Fully Homomorphic Encryption",
-        "Fractional Homomorphic Encryption",
-        "Fundamental Homomorphic Encryption",
-      ],
-      answer: "Fully Homomorphic Encryption",
-    },
-    {
-      question: "What is the key feature of FHE?",
-      options: [
-        "Data must be decrypted before processing",
-        "Computation can happen on encrypted data without decryption",
-        "It only works for strings",
-        "It replaces blockchain consensus mechanism",
-      ],
-      answer: "Computation can happen on encrypted data without decryption",
-    },
-    {
-      question: "Which of these is a reason Zama is building FHE tooling?",
-      options: [
-        "To make data fully public",
-        "To enforce centralized servers",
-        "To make encrypted computation accessible for developers",
-        "To eliminate encryption altogether",
-      ],
-      answer: "To make encrypted computation accessible for developers",
-    },
-    {
-      question: "What is FHEVM in the Zama ecosystem?",
-      options: [
-        "A virtual machine for fully homomorphic execution",
-        "A type of token",
-        "A browser extension",
-        "A consensus algorithm",
-      ],
-      answer: "A virtual machine for fully homomorphic execution",
-    },
-    {
-      question: "On Zama’s site it is claimed that Zama currently handles about how many transactions per second (tps) per chain?",
-      options: ["2", "10", "20", "100"],
-      answer: "20",
-    },
-    {
-      question: "What is the purpose of Zama’s Bounty Program?",
-      options: [
-        "To reward random users with NFTs",
-        "To let contributors build tutorials, code, and get rewarded",
-        "To sell tokens at discount",
-        "To host parties",
-      ],
-      answer: "To let contributors build tutorials, code, and get rewarded",
-    },
-    {
-      question: "Zama’s token portal promises features like staking, governance, and confidential transfers. What is its name?",
-      options: ["Zama Token Hub", "$ZAMA Portal", "Zama Vault", "Zama Chain"],
-      answer: "$ZAMA Portal",
-    },
-    {
-      question: "Which problem is Zama trying to solve on-chain with FHE?",
-      options: [
-        "Increase block size",
-        "Confidentiality of data even during processing",
-        "Lower gas fees only",
-        "Remove smart contracts",
-      ],
-      answer: "Confidentiality of data even during processing",
-    },
-    {
-      question: "Which of these is listed among Zama’s potential applications / use-cases?",
-      options: [
-        "On-chain gaming only",
-        "Confidential token launches, sealed-bid auctions, lending",
-        "Social media platform",
-        "Web hosting service",
-      ],
-      answer: "Confidential token launches, sealed-bid auctions, lending",
-    },
-    {
-      question: "What is the relationship between Zama and open source?",
-      options: [
-        "Zama is closed source",
-        "Zama maintains open source libs, repos, research",
-        "Zama uses proprietary encryption only",
-        "Zama forbids community contributions",
-      ],
-      answer: "Zama maintains open source libs, repos, research",
-    },
-  ];
+const quizData = [
+  {
+    question: "What does FHE stand for?",
+    options: [
+      "Fast Homomorphic Encryption",
+      "Fully Homomorphic Encryption",
+      "Fractional Homomorphic Encryption",
+      "Fundamental Homomorphic Encryption",
+    ],
+    answer: "Fully Homomorphic Encryption",
+  },
+  {
+    question: "What is the key feature of FHE?",
+    options: [
+      "Data must be decrypted before processing",
+      "Computation can happen on encrypted data without decryption",
+      "It only works for strings",
+      "It replaces blockchain consensus mechanism",
+    ],
+    answer: "Computation can happen on encrypted data without decryption",
+  },
+  {
+    question: "Which of these is a reason Zama is building FHE tooling?",
+    options: [
+      "To make data fully public",
+      "To enforce centralized servers",
+      "To make encrypted computation accessible for developers",
+      "To eliminate encryption altogether",
+    ],
+    answer: "To make encrypted computation accessible for developers",
+  },
+  {
+    question: "What is FHEVM in the Zama ecosystem?",
+    options: [
+      "A virtual machine for fully homomorphic execution",
+      "A type of token",
+      "A browser extension",
+      "A consensus algorithm",
+    ],
+    answer: "A virtual machine for fully homomorphic execution",
+  },
+  {
+    question: "Zama’s Concrete library is mainly written in which language?",
+    options: ["Rust", "Python", "C++", "Go"],
+    answer: "Rust",
+  },
+  {
+    question: "What is the purpose of Zama’s Bounty Program?",
+    options: [
+      "To reward random users with NFTs",
+      "To let contributors build tutorials, code, and get rewarded",
+      "To sell tokens at discount",
+      "To host parties",
+    ],
+    answer: "To let contributors build tutorials, code, and get rewarded",
+  },
+  {
+    question: "Which of these is listed among Zama’s potential applications?",
+    options: [
+      "On-chain gaming only",
+      "Confidential token launches, sealed-bid auctions, lending",
+      "Social media platform",
+      "Web hosting service",
+    ],
+    answer: "Confidential token launches, sealed-bid auctions, lending",
+  },
+  {
+    question: "Which problem is Zama trying to solve on-chain with FHE?",
+    options: [
+      "Increase block size",
+      "Confidentiality of data even during processing",
+      "Lower gas fees only",
+      "Remove smart contracts",
+    ],
+    answer: "Confidentiality of data even during processing",
+  },
+  {
+    question: "Zama’s $ZAMA portal provides?",
+    options: [
+      "Token Hub",
+      "Staking, governance & confidential transfers",
+      "NFT marketplace",
+      "DEX only",
+    ],
+    answer: "Staking, governance & confidential transfers",
+  },
+  {
+    question: "What is Zama’s approach towards open source?",
+    options: [
+      "Zama is closed source",
+      "Zama maintains open source libs, repos, research",
+      "Zama uses proprietary encryption only",
+      "Zama forbids community contributions",
+    ],
+    answer: "Zama maintains open source libs, repos, research",
+  },
+];
 
+function App() {
   const [current, setCurrent] = useState(0);
   const [userAnswers, setUserAnswers] = useState([]);
-  const [showResult, setShowResult] = useState(false);
+  const [finished, setFinished] = useState(false);
   const [showAnswers, setShowAnswers] = useState(false);
 
   const handleAnswer = (option) => {
@@ -105,63 +109,66 @@ export default function ZamaExplainer() {
     if (current + 1 < quizData.length) {
       setCurrent(current + 1);
     } else {
-      setShowResult(true);
+      setFinished(true);
     }
   };
 
-  const calculateScore = () => {
-    let score = 0;
-    quizData.forEach((q, idx) => {
-      if (userAnswers[idx] === q.answer) score++;
-    });
-    return score;
-  };
+  const score = quizData.reduce(
+    (acc, q, idx) => (userAnswers[idx] === q.answer ? acc + 1 : acc),
+    0
+  );
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-800 p-6">
-      <h1 className="text-3xl font-bold text-center mb-6">Zama Community Quiz 🧠</h1>
+    <div className="flex items-center justify-center min-h-screen p-4 bg-gray-100">
+      <div className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-xl">
+        <h1 className="text-2xl font-bold mb-4 text-center">Zama Community Quiz 🧠</h1>
 
-      {!showResult ? (
-        <div className="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
-          <h2 className="text-lg font-semibold mb-4">
-            Q{current + 1}. {quizData[current].question}
-          </h2>
-          <div className="space-y-2">
-            {quizData[current].options.map((opt, i) => (
-              <button
-                key={i}
-                onClick={() => handleAnswer(opt)}
-                className="w-full text-left p-3 bg-gray-100 hover:bg-blue-100 rounded-lg"
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <div className="max-w-xl mx-auto bg-white p-6 rounded-xl shadow">
-          <h2 className="text-xl font-bold mb-2">🎉 You scored {calculateScore()} / {quizData.length}</h2>
-          <button
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg"
-            onClick={() => setShowAnswers(!showAnswers)}
-          >
-            {showAnswers ? "Hide Answers" : "Show Answers"}
-          </button>
-
-          {showAnswers && (
-            <div className="mt-6 space-y-4">
-              {quizData.map((q, idx) => (
-                <div key={idx} className="p-4 border rounded-lg">
-                  <p className="font-semibold">Q{idx + 1}: {q.question}</p>
-                  <p>Your answer: <span className={userAnswers[idx] === q.answer ? "text-green-600" : "text-red-600"}>{userAnswers[idx]}</span></p>
-                  <p>Correct answer: <span className="text-green-600">{q.answer}</span></p>
-                </div>
+        {!finished ? (
+          <div>
+            <p className="text-lg font-semibold mb-3">
+              Q{current + 1}: {quizData[current].question}
+            </p>
+            <div className="grid gap-3">
+              {quizData[current].options.map((opt, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleAnswer(opt)}
+                  className="px-4 py-2 rounded-lg border hover:bg-blue-100"
+                >
+                  {opt}
+                </button>
               ))}
             </div>
-          )}
-        </div>
-      )}
+            <p className="mt-4 text-sm text-gray-500">
+              Question {current + 1} of {quizData.length}
+            </p>
+          </div>
+        ) : (
+          <div className="text-center">
+            <h2 className="text-xl font-bold mb-3">🎉 You scored {score} / {quizData.length}</h2>
+            <button
+              onClick={() => setShowAnswers(!showAnswers)}
+              className="mt-4 px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+            >
+              {showAnswers ? "Hide Answers" : "Show Answers"}
+            </button>
+
+            {showAnswers && (
+              <div className="mt-6 text-left">
+                {quizData.map((q, idx) => (
+                  <div key={idx} className="mb-4 p-3 border rounded-lg">
+                    <p className="font-semibold">Q{idx + 1}: {q.question}</p>
+                    <p>Your answer: <span className={userAnswers[idx] === q.answer ? "text-green-600" : "text-red-600"}>{userAnswers[idx]}</span></p>
+                    <p>Correct: <span className="text-green-600">{q.answer}</span></p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
+export default App;
