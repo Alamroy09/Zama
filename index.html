@@ -43,16 +43,26 @@
       </button>
     </div>
 
-    <!-- Submit & Score -->
-    <button onclick="submitScore()" id="submit-btn" class="mt-6 bg-yellow-500 hover:bg-yellow-600 px-6 py-3 rounded-xl font-semibold w-full">
-      Submit Score
-    </button>
+    <!-- Submit Score (only appears after last question) -->
+    <div id="submit-container" class="mt-6 hidden">
+      <button onclick="submitScore()" id="submit-btn" class="bg-yellow-500 hover:bg-yellow-600 px-6 py-3 rounded-xl font-semibold w-full">
+        Submit Score
+      </button>
+    </div>
+
+    <!-- Score Display -->
     <div id="score" class="hidden mt-4 text-center text-2xl font-bold"></div>
 
-    <!-- Show Answers -->
-    <button onclick="showAnswers()" id="show-btn" class="mt-6 bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-semibold w-full">
-      Show All Answers
-    </button>
+    <!-- Show Answers + Restart Quiz -->
+    <div id="answer-restart-container" class="hidden mt-6 flex flex-col items-center">
+      <button onclick="showAnswers()" id="show-btn" class="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-semibold w-full mb-4">
+        Show All Answers
+      </button>
+      <button onclick="restartQuiz()" class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-semibold w-full">
+        Restart Quiz
+      </button>
+    </div>
+
     <div id="answers" class="hidden mt-6 bg-gray-700 p-4 rounded-xl text-left"></div>
   </div>
 
@@ -125,8 +135,21 @@
 
       container.appendChild(qDiv);
 
+      // Navigation buttons
       document.getElementById('prev-btn').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
       document.getElementById('next-btn').style.visibility = currentIndex === quizData.length - 1 ? 'hidden' : 'visible';
+
+      // Show Submit only on last question
+      if(currentIndex === quizData.length -1){
+        document.getElementById('submit-container').classList.remove('hidden');
+      } else {
+        document.getElementById('submit-container').classList.add('hidden');
+      }
+
+      // Hide answer/restart until after submit
+      document.getElementById('answer-restart-container').classList.add('hidden');
+      document.getElementById('answers').classList.add('hidden');
+      document.getElementById('score').classList.add('hidden');
     }
 
     function nextQuestion() { if (currentIndex < quizData.length - 1) { currentIndex++; renderQuestion(); } }
@@ -138,6 +161,12 @@
       const scoreDiv = document.getElementById('score');
       scoreDiv.textContent = `Your Score: ${score} / ${quizData.length}`;
       scoreDiv.classList.remove('hidden');
+
+      // Show Show Answers + Restart button
+      document.getElementById('answer-restart-container').classList.remove('hidden');
+
+      // Hide submit button
+      document.getElementById('submit-container').classList.add('hidden');
     }
 
     function showAnswers() {
@@ -150,6 +179,15 @@
         ansDiv.appendChild(p);
       });
       ansDiv.classList.remove('hidden');
+    }
+
+    function restartQuiz(){
+      currentIndex = 0;
+      userAnswers = new Array(quizData.length).fill(null);
+      document.getElementById('answer-restart-container').classList.add('hidden');
+      document.getElementById('quiz-container').innerHTML = '';
+      document.getElementById('quiz-screen').classList.remove('hidden');
+      renderQuestion();
     }
   </script>
 
