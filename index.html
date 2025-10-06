@@ -23,7 +23,7 @@
       </div>
 
       <div class="mt-8 flex flex-col items-center gap-4">
-        <button id="start-btn" onclick="startQuiz()"
+        <button id="start-btn"
                 class="px-8 py-3 rounded-xl font-semibold shadow-lg transform hover:-translate-y-0.5 transition bg-gradient-to-r from-purple-600 to-cyan-500 text-white">
           Start Quiz
         </button>
@@ -35,7 +35,6 @@
     <!-- Quiz Screen -->
     <div id="quiz-screen" class="hidden min-h-[60vh] flex flex-col items-center justify-center rounded-2xl p-8 shadow-lg" style="background: linear-gradient(180deg,#ffffff,#f3f7ff)">
 
-      <!-- Progress + Number -->
       <div class="w-full mb-4">
         <div class="w-full bg-gray-200 rounded-full h-2">
           <div id="progress-bar" class="h-2 rounded-full" style="width:0; background: linear-gradient(90deg,#7c3aed,#06b6d4); transition: width .3s;"></div>
@@ -43,41 +42,36 @@
         <p id="question-number" class="text-center text-sm text-gray-600 mt-2"></p>
       </div>
 
-      <!-- Question card -->
       <div id="quiz-container" class="w-full flex flex-col items-center"></div>
 
-      <!-- Navigation -->
       <div class="flex justify-between w-full mt-6">
-        <button id="prev-btn" onclick="prevQuestion()" class="px-5 py-2 rounded-lg bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-50 hidden">
+        <button id="prev-btn" class="px-5 py-2 rounded-lg bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-50 hidden">
           Previous
         </button>
 
         <div class="flex gap-3">
-          <button id="next-btn" onclick="nextQuestion()" class="px-5 py-2 rounded-lg bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-50 opacity-50" disabled>
+          <button id="next-btn" class="px-5 py-2 rounded-lg bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-50 opacity-50" disabled>
             Next
           </button>
-
-          <!-- Submit (only shown on last question) -->
-          <button id="submit-btn" onclick="submitScore()" class="px-5 py-2 rounded-lg bg-gradient-to-r from-yellow-400 to-amber-400 text-white hidden">
+          <button id="submit-btn" class="px-5 py-2 rounded-lg bg-gradient-to-r from-yellow-400 to-amber-400 text-white hidden">
             Submit Score
           </button>
         </div>
       </div>
 
-      <!-- Score + actions -->
       <div id="result-area" class="w-full max-w-xl mt-6 text-center">
         <div id="score" class="text-2xl font-semibold text-gray-800 hidden"></div>
 
         <div id="after-actions" class="mt-4 flex flex-col items-center gap-3 hidden">
-          <button id="show-answers-btn" onclick="showAnswers()" class="w-full max-w-sm px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-semibold">
+          <button id="show-answers-btn" class="w-full max-w-sm px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-semibold">
             Show All Answers
           </button>
 
           <div class="flex gap-3 w-full max-w-sm">
-            <button id="share-btn" onclick="shareOnX()" class="flex-1 px-4 py-2 rounded-lg border border-gray-200 bg-white text-indigo-600 hover:bg-gray-50">
+            <button id="share-btn" class="flex-1 px-4 py-2 rounded-lg border border-gray-200 bg-white text-indigo-600 hover:bg-gray-50">
               Share on X
             </button>
-            <button id="restart-btn" onclick="restartQuiz()" class="flex-1 px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700">
+            <button id="restart-btn" class="flex-1 px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700">
               Restart Quiz
             </button>
           </div>
@@ -91,228 +85,86 @@
   </div>
 
   <script>
-    // 15 questions: 5 FHE + 10 OG NFT style (English)
+    // --- QUESTIONS ---
     const quizData = [
-      // 5 FHE questions
-      {
-        question: "What does FHE stand for?",
-        options: ["Fast Homomorphic Encryption","Fully Homomorphic Encryption","Fractional Homomorphic Encryption","Fundamental Homomorphic Encryption"],
-        answer: "Fully Homomorphic Encryption"
-      },
-      {
-        question: "What is the key feature of FHE?",
-        options: ["Data must be decrypted before processing","Computation can happen on encrypted data without decryption","It only works for strings","It replaces blockchain consensus mechanisms"],
-        answer: "Computation can happen on encrypted data without decryption"
-      },
-      {
-        question: "Why is Zama building FHE tooling?",
-        options: ["To make data fully public","To enforce centralized servers","To make encrypted computation accessible for developers","To eliminate encryption altogether"],
-        answer: "To make encrypted computation accessible for developers"
-      },
-      {
-        question: "What is FHEVM in the Zama ecosystem?",
-        options: ["A virtual machine for fully homomorphic execution","A type of token","A browser extension","A consensus algorithm"],
-        answer: "A virtual machine for fully homomorphic execution"
-      },
-      {
-        question: "Which encryption scheme is commonly used in Zama's libraries for fast bootstrapping and inference?",
-        options: ["RSA","TFHE","AES","Paillier"],
-        answer: "TFHE"
-      },
-
-      // 10 OG NFT / community questions (examples suitable for OG NFT 003 session)
-      {
-        question: "What is the primary goal of Zama's OG NFT program?",
-        options: ["To sell art","To onboard and reward community creators","To promote only trading","To provide cloud hosting"],
-        answer: "To onboard and reward community creators"
-      },
-      {
-        question: "How can community members typically earn OG NFTs in Zama programs?",
-        options: ["By buying from marketplaces only","By creating valuable content and participating in community tasks","By attending paid workshops only","By solving puzzles offline"],
-        answer: "By creating valuable content and participating in community tasks"
-      },
-      {
-        question: "Which platform does Zama often use for live community discussions and creator coordination?",
-        options: ["LinkedIn","Discord","Flickr","Medium"],
-        answer: "Discord"
-      },
-      {
-        question: "What kind of rewards are commonly associated with Zama OG NFT events?",
-        options: ["Only vanity badges","Exclusive access, recognition, and sometimes monetary rewards","Only free software","Only NFT art downloads"],
-        answer: "Exclusive access, recognition, and sometimes monetary rewards"
-      },
-      {
-        question: "Who is the OG NFT usually aimed at?",
-        options: ["Random website visitors","Active contributors and creators in the Zama community","Only Zama employees","Only investors"],
-        answer: "Active contributors and creators in the Zama community"
-      },
-      {
-        question: "What is one typical evaluation criteria for earning OG NFTs?",
-        options: ["Number of forum logins","Quality and usefulness of shared content","Amount of paid promotion","Country of residence"],
-        answer: "Quality and usefulness of shared content"
-      },
-      {
-        question: "Which of these is a reason Zama runs community campaigns like OG NFT sessions?",
-        options: ["To create community engagement and amplify educational content","To distribute tokens widely only","To replace documentation","To block new developers"],
-        answer: "To create community engagement and amplify educational content"
-      },
-      {
-        question: "What does receiving an OG NFT often grant within the Zama ecosystem?",
-        options: ["Automatic employment","Exclusive early access or privileges","Unlimited cloud credits","Ownership of Zama company"],
-        answer: "Exclusive early access or privileges"
-      },
-      {
-        question: "How should creators share their contributions to be eligible for OG NFTs?",
-        options: ["Share in private only","Publish helpful, public content and link it to the program channels","Only post on unrelated forums","Send as email attachments"],
-        answer: "Publish helpful, public content and link it to the program channels"
-      },
-      {
-        question: "Where can participants find official details about OG NFT sessions and eligibility?",
-        options: ["Unofficial blogs only","Official Zama channels (website, Discord, X/Twitter, Guild)","Random social posts","Private chat groups only"],
-        answer: "Official Zama channels (website, Discord, X/Twitter, Guild)"
-      }
+      { question: "What does FHE stand for?", options: ["Fast Homomorphic Encryption","Fully Homomorphic Encryption","Fractional Homomorphic Encryption","Fundamental Homomorphic Encryption"], answer: "Fully Homomorphic Encryption" },
+      { question: "What is the key feature of FHE?", options: ["Data must be decrypted before processing","Computation can happen on encrypted data without decryption","It only works for strings","It replaces blockchain consensus mechanisms"], answer: "Computation can happen on encrypted data without decryption" },
+      { question: "Why is Zama building FHE tooling?", options: ["To make data fully public","To enforce centralized servers","To make encrypted computation accessible for developers","To eliminate encryption altogether"], answer: "To make encrypted computation accessible for developers" },
+      { question: "What is FHEVM in the Zama ecosystem?", options: ["A virtual machine for fully homomorphic execution","A type of token","A browser extension","A consensus algorithm"], answer: "A virtual machine for fully homomorphic execution" },
+      { question: "Which encryption scheme is commonly used in Zama's libraries for fast bootstrapping and inference?", options: ["RSA","TFHE","AES","Paillier"], answer: "TFHE" },
+      { question: "What is the primary goal of Zama's OG NFT program?", options: ["To sell art","To onboard and reward community creators","To promote only trading","To provide cloud hosting"], answer: "To onboard and reward community creators" },
+      { question: "How can community members typically earn OG NFTs in Zama programs?", options: ["By buying from marketplaces only","By creating valuable content and participating in community tasks","By attending paid workshops only","By solving puzzles offline"], answer: "By creating valuable content and participating in community tasks" },
+      { question: "Which platform does Zama often use for live community discussions and creator coordination?", options: ["LinkedIn","Discord","Flickr","Medium"], answer: "Discord" },
+      { question: "What kind of rewards are commonly associated with Zama OG NFT events?", options: ["Only vanity badges","Exclusive access, recognition, and sometimes monetary rewards","Only free software","Only NFT art downloads"], answer: "Exclusive access, recognition, and sometimes monetary rewards" },
+      { question: "Who is the OG NFT usually aimed at?", options: ["Random website visitors","Active contributors and creators in the Zama community","Only Zama employees","Only investors"], answer: "Active contributors and creators in the Zama community" }
     ];
 
-    let userAnswers = new Array(quizData.length).fill(null);
     let currentIndex = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
 
-    // UI elements
     const startScreen = document.getElementById('start-screen');
     const quizScreen = document.getElementById('quiz-screen');
+    const startBtn = document.getElementById('start-btn');
     const quizContainer = document.getElementById('quiz-container');
-    const progressBar = document.getElementById('progress-bar');
-    const questionNumber = document.getElementById('question-number');
-    const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
+    const prevBtn = document.getElementById('prev-btn');
     const submitBtn = document.getElementById('submit-btn');
     const scoreEl = document.getElementById('score');
     const afterActions = document.getElementById('after-actions');
-    const answerRestartContainer = document.getElementById('after-actions'); // same
     const answersDiv = document.getElementById('answers');
-    const resultArea = document.getElementById('result-area');
+    const progressBar = document.getElementById('progress-bar');
+    const questionNumber = document.getElementById('question-number');
+    const showAnswersBtn = document.getElementById('show-answers-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const shareBtn = document.getElementById('share-btn');
 
-    // Start quiz
+    startBtn.addEventListener("click", startQuiz);
+    nextBtn.addEventListener("click", nextQuestion);
+    prevBtn.addEventListener("click", prevQuestion);
+    submitBtn.addEventListener("click", submitScore);
+    showAnswersBtn.addEventListener("click", showAnswers);
+    restartBtn.addEventListener("click", restartQuiz);
+    shareBtn.addEventListener("click", shareOnX);
+
     function startQuiz() {
       startScreen.classList.add('hidden');
       quizScreen.classList.remove('hidden');
-      currentIndex = 0;
-      userAnswers = new Array(quizData.length).fill(null);
       renderQuestion();
     }
 
-    function updateProgress() {
-      const pct = ((currentIndex + 1) / quizData.length) * 100;
-      progressBar.style.width = pct + '%';
+    function renderQuestion() {
+      const q = quizData[currentIndex];
+      quizContainer.innerHTML = `
+        <div class="w-full max-w-xl bg-white rounded-lg shadow-md p-6 border">
+          <h2 class="text-lg font-semibold text-gray-800 mb-4">${q.question}</h2>
+          <div class="flex flex-col gap-3">
+            ${q.options.map(opt => `
+              <button class="option-btn text-left px-4 py-3 rounded-lg border border-gray-200 hover:shadow-sm transition">${opt}</button>
+            `).join("")}
+          </div>
+        </div>
+      `;
+
+      document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.onclick = () => {
+          userAnswers[currentIndex] = btn.textContent;
+          document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('bg-gradient-to-r','from-purple-600','to-cyan-400','text-white'));
+          btn.classList.add('bg-gradient-to-r','from-purple-600','to-cyan-400','text-white');
+          nextBtn.disabled = false;
+          nextBtn.classList.remove('opacity-50');
+          nextBtn.classList.add('bg-gradient-to-r','from-purple-600','to-cyan-400','text-white');
+        };
+      });
+
+      prevBtn.style.display = currentIndex === 0 ? "none" : "inline-flex";
+      nextBtn.style.display = currentIndex < quizData.length - 1 ? "inline-flex" : "none";
+      submitBtn.style.display = currentIndex === quizData.length - 1 ? "inline-flex" : "none";
+      nextBtn.disabled = !userAnswers[currentIndex];
+      progressBar.style.width = ((currentIndex + 1) / quizData.length * 100) + "%";
       questionNumber.textContent = `Question ${currentIndex + 1} of ${quizData.length}`;
     }
 
-    function renderQuestion() {
-      updateProgress();
-      answersDiv.classList.add('hidden');
-      scoreEl.classList.add('hidden');
-      afterActions.classList.add('hidden');
-
-      const q = quizData[currentIndex];
-      quizContainer.innerHTML = '';
-
-      // Card
-      const card = document.createElement('div');
-      card.className = 'w-full max-w-xl bg-white rounded-lg shadow-md p-6 border';
-      
-      // question text
-      const qText = document.createElement('h2');
-      qText.className = 'text-lg font-semibold text-gray-800 mb-4';
-      qText.textContent = q.question;
-      card.appendChild(qText);
-
-      // options
-      const optsWrap = document.createElement('div');
-      optsWrap.className = 'flex flex-col gap-3';
-      q.options.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'text-left px-4 py-3 rounded-lg border border-gray-200 hover:shadow-sm transition flex items-center justify-between bg-white';
-        btn.innerHTML = `<span class="truncate">${opt}</span>`;
-        btn.onclick = () => {
-          // store answer
-          userAnswers[currentIndex] = opt;
-          // highlight selected visually
-          Array.from(optsWrap.children).forEach(b => {
-            b.classList.remove('bg-gradient-to-r','from-purple-600','to-cyan-400','text-white','border-transparent');
-            b.classList.add('bg-white'); b.classList.remove('opacity-80');
-          });
-          btn.classList.add('bg-gradient-to-r','from-purple-600','to-cyan-400','text-white','border-transparent');
-          // enable next or submit
-          if (currentIndex < quizData.length - 1) {
-            nextBtn.disabled = false;
-            nextBtn.classList.remove('opacity-50');
-            nextBtn.classList.remove('cursor-not-allowed');
-            nextBtn.classList.remove('bg-gray-100');
-            nextBtn.classList.add('bg-gradient-to-r','from-purple-600','to-cyan-400','text-white');
-          } else {
-            // last question -> enable submit
-            submitBtn.classList.remove('hidden');
-            submitBtn.disabled = false;
-            submitBtn.classList.remove('opacity-50');
-          }
-        };
-        optsWrap.appendChild(btn);
-      });
-
-      card.appendChild(optsWrap);
-      quizContainer.appendChild(card);
-
-      // prev/next visibility & state
-      prevBtn.style.display = currentIndex === 0 ? 'none' : 'inline-flex';
-      if (currentIndex < quizData.length - 1) {
-        // show next; hide submit
-        nextBtn.style.display = 'inline-flex';
-        submitBtn.style.display = 'none';
-        // disable next until option selected
-        if (userAnswers[currentIndex]) {
-          nextBtn.disabled = false;
-          nextBtn.classList.remove('opacity-50');
-          nextBtn.classList.remove('cursor-not-allowed');
-          nextBtn.classList.remove('bg-gray-100');
-          nextBtn.classList.add('bg-gradient-to-r','from-purple-600','to-cyan-400','text-white');
-          // highlight selected option visually
-          // find selected and style
-          Array.from(optsWrap.children).forEach(b => {
-            if (b.innerText.trim() === userAnswers[currentIndex]) {
-              b.classList.add('bg-gradient-to-r','from-purple-600','to-cyan-400','text-white','border-transparent');
-            }
-          });
-        } else {
-          nextBtn.disabled = true;
-          nextBtn.classList.add('opacity-50');
-          nextBtn.classList.add('cursor-not-allowed');
-          nextBtn.classList.add('bg-gray-100');
-          nextBtn.classList.remove('bg-gradient-to-r','from-purple-600','to-cyan-400','text-white');
-        }
-      } else {
-        // last question
-        nextBtn.style.display = 'none';
-        submitBtn.style.display = 'inline-flex';
-        // disable submit until selection
-        if (userAnswers[currentIndex]) {
-          submitBtn.disabled = false;
-          submitBtn.classList.remove('opacity-50');
-        } else {
-          submitBtn.disabled = true;
-          submitBtn.classList.add('opacity-50');
-        }
-        // highlight previously selected if any
-        Array.from(optsWrap.children).forEach(b => {
-          if (b.innerText.trim() === userAnswers[currentIndex]) {
-            b.classList.add('bg-gradient-to-r','from-purple-600','to-cyan-400','text-white','border-transparent');
-          }
-        });
-      }
-    }
-
     function nextQuestion() {
-      // ensure current has selection
-      if (!userAnswers[currentIndex]) return;
       if (currentIndex < quizData.length - 1) {
         currentIndex++;
         renderQuestion();
@@ -327,83 +179,44 @@
     }
 
     function submitScore() {
-      // compute score
       let score = 0;
-      for (let i = 0; i < quizData.length; i++) {
-        if (userAnswers[i] === quizData[i].answer) score++;
-      }
-      scoreEl.textContent = `Your Score: ${score} / ${quizData.length}`;
+      quizData.forEach((q, i) => { if (userAnswers[i] === q.answer) score++; });
+      scoreEl.textContent = `Your Score: ${score}/${quizData.length}`;
       scoreEl.classList.remove('hidden');
-
-      // show actions: show answers, share, restart
       afterActions.classList.remove('hidden');
-
-      // hide submit/next area visually
-      submitBtn.style.display = 'none';
-      nextBtn.style.display = 'none';
-      prevBtn.style.display = 'none';
+      quizContainer.innerHTML = "";
+      nextBtn.style.display = "none";
+      prevBtn.style.display = "none";
+      submitBtn.style.display = "none";
     }
 
     function showAnswers() {
-      answersDiv.innerHTML = '';
-      quizData.forEach((q, i) => {
-        const user = userAnswers[i] ? userAnswers[i] : '(No answer)';
-        const correct = q.answer;
-        const block = document.createElement('div');
-        block.className = 'mb-3 p-3 rounded-md';
-        block.style.background = i % 2 === 0 ? '#ffffff' : '#f7fbff';
-        block.innerHTML = `
-          <div class="text-sm text-gray-700"><strong>Q${i+1}:</strong> ${q.question}</div>
-          <div class="mt-2 text-sm">
-            <span class="text-gray-600">Your answer:</span>
-            <span class="${user===correct ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}"> ${user}</span>
-          </div>
-          <div class="text-sm mt-1">
-            <span class="text-gray-600">Correct answer:</span> <span class="text-indigo-700 font-semibold"> ${correct}</span>
-          </div>
-        `;
-        answersDiv.appendChild(block);
-      });
+      answersDiv.innerHTML = quizData.map((q, i) => `
+        <div class="mb-3 p-3 bg-gray-50 rounded-md">
+          <div class="font-medium text-gray-700">Q${i+1}: ${q.question}</div>
+          <div class="text-sm text-gray-600 mt-1">Your: ${userAnswers[i] || '(no answer)'} | Correct: <span class="text-indigo-600">${q.answer}</span></div>
+        </div>
+      `).join("");
       answersDiv.classList.remove('hidden');
-      // scroll into view (optional)
-      answersDiv.scrollIntoView({ behavior: 'smooth' });
     }
 
     function restartQuiz() {
-      userAnswers = new Array(quizData.length).fill(null);
       currentIndex = 0;
-      // reset UI
+      userAnswers.fill(null);
       scoreEl.classList.add('hidden');
       afterActions.classList.add('hidden');
       answersDiv.classList.add('hidden');
-      // show quiz start again (optionally go to start screen)
-      // we'll go back to start screen for a fresh UX
       quizScreen.classList.add('hidden');
       startScreen.classList.remove('hidden');
     }
 
     function shareOnX() {
-      // Prepare share text (short)
       let score = 0;
-      for (let i = 0; i < quizData.length; i++) {
-        if (userAnswers[i] === quizData[i].answer) score++;
-      }
-      const text = encodeURIComponent(`I scored ${score}/${quizData.length} on the Zama FHE & OG NFT Community Quiz! 🔐🧠 Join the community: https://zama.ai`);
+      quizData.forEach((q, i) => { if (userAnswers[i] === q.answer) score++; });
+      const text = encodeURIComponent(`I scored ${score}/${quizData.length} on the Zama FHE & OG NFT Quiz 🔐🧠`);
       const url = `https://x.com/intent/tweet?text=${text}`;
-      window.open(url, '_blank');
+      window.open(url, "_blank");
     }
-
-    // Initially hide quiz screen
-    const quizScreen = document.getElementById('quiz-screen');
-    const startScreen = document.getElementById('start-screen');
-    // Make sure controls exist before first render
-    // (Start screen Start button calls startQuiz directly)
-
   </script>
-
-  <style>
-    /* small readable tweaks */
-    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
-  </style>
 </body>
 </html>
