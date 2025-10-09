@@ -6,6 +6,10 @@
   <title>Zama FHE Quiz</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    body {
+      background: linear-gradient(135deg, #0f172a, #1e3a8a, #0f172a);
+      background-attachment: fixed;
+    }
     .selected { background-color: #2563eb !important; }
     .progress-container {
       height: 8px;
@@ -22,17 +26,17 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center text-white bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a]">
+<body class="min-h-screen flex items-center justify-center text-white">
 
   <!-- Start Screen -->
-  <div id="start-screen" class="text-center space-y-6">
-    <h1 class="text-4xl font-bold">Zama FHE Quiz</h1>
-    <p class="text-gray-400 text-lg">Test your knowledge about Zama & Fully Homomorphic Encryption 🔐</p>
+  <div id="start-screen" class="text-center space-y-6 bg-gray-800/70 p-10 rounded-2xl shadow-xl backdrop-blur-md">
+    <h1 class="text-4xl font-bold text-blue-400">Zama FHE Quiz</h1>
+    <p class="text-gray-300 text-lg">Test your knowledge about Zama & Fully Homomorphic Encryption 🔐</p>
     <button onclick="startQuiz()" class="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-xl font-semibold shadow-md transition">Start Quiz</button>
   </div>
 
   <!-- Quiz Screen -->
-  <div id="quiz-screen" class="hidden w-full max-w-2xl bg-gray-800 p-8 rounded-2xl shadow-lg text-center">
+  <div id="quiz-screen" class="hidden w-full max-w-2xl bg-gray-800/80 p-8 rounded-2xl shadow-lg text-center backdrop-blur-md">
     <div class="progress-container">
       <div id="progress-bar" class="progress-bar"></div>
     </div>
@@ -41,8 +45,8 @@
   </div>
 
   <!-- Result Screen -->
-  <div id="result-screen" class="hidden text-center space-y-4">
-    <h2 class="text-3xl font-bold">🎉 Quiz Complete!</h2>
+  <div id="result-screen" class="hidden text-center space-y-4 bg-gray-800/70 p-10 rounded-2xl shadow-lg backdrop-blur-md">
+    <h2 class="text-3xl font-bold text-blue-400">🎉 Quiz Complete!</h2>
     <p class="text-lg text-gray-300">Great job learning about Zama & FHE!</p>
     <p id="score-text" class="text-xl text-gray-200 font-semibold"></p>
 
@@ -82,10 +86,7 @@
       { question: "Which open-source model is Zama promoting?", options: ["Community-driven privacy computing", "Centralized AI governance", "Ad-based encryption", "Closed-source AI"], answer: "Community-driven privacy computing" }
     ];
 
-    let currentQuestion = 0;
-    let score = 0;
-    let selectedOption = null;
-
+    let currentQuestion = 0, score = 0, selectedOption = null;
     const startScreen = document.getElementById("start-screen");
     const quizScreen = document.getElementById("quiz-screen");
     const resultScreen = document.getElementById("result-screen");
@@ -120,10 +121,10 @@
       updateProgress();
     }
 
-    function selectOption(button) {
-      document.querySelectorAll(".option").forEach(btn => btn.classList.remove("selected"));
-      button.classList.add("selected");
-      selectedOption = button.innerText;
+    function selectOption(btn) {
+      document.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedOption = btn.innerText;
       nextBtn.disabled = false;
       nextBtn.classList.remove("opacity-50", "cursor-not-allowed");
     }
@@ -132,16 +133,11 @@
       if (!selectedOption) return;
       if (selectedOption === quizData[currentQuestion].answer) score++;
       currentQuestion++;
-      if (currentQuestion < quizData.length) {
-        showQuestion();
-      } else {
-        showResult();
-      }
+      if (currentQuestion < quizData.length) showQuestion(); else showResult();
     }
 
     function updateProgress() {
-      const progress = ((currentQuestion) / quizData.length) * 100;
-      progressBar.style.width = `${progress}%`;
+      progressBar.style.width = `${(currentQuestion / quizData.length) * 100}%`;
     }
 
     function showResult() {
