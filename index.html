@@ -16,47 +16,14 @@
       background: linear-gradient(135deg, #1e1b4b, #6c1ac3, #f0b429);
       color: white;
     }
-    .fade-in {
-      animation: fadeIn 1s ease forwards;
-    }
-    @keyframes fadeIn {
-      0% { opacity: 0; transform: translateY(20px);}
-      100% { opacity: 1; transform: translateY(0);}
-    }
-    .glass-card {
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 600px;
-      width: 90%;
-      text-align: center;
-    }
-    .start-btn {
-      background-color: #f0b429;
-      color: #1e1b4b;
-      padding: 15px 40px;
-      font-size: 1.2rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: transform 0.3s, background-color 0.3s;
-    }
-    .start-btn:hover {
-      transform: scale(1.1);
-      background-color: #d49b1a;
-    }
-    .quiz-btn {
-      transition: all 0.2s;
-    }
-    .quiz-btn:hover {
-      background-color: #3b82f6;
-    }
-    #next-btn {
-      margin-top: 20px;
-      display: inline-block;
-    }
+    .fade-in { animation: fadeIn 1s ease forwards; }
+    @keyframes fadeIn { 0% {opacity:0; transform:translateY(20px);} 100% {opacity:1; transform:translateY(0);} }
+    .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 20px; padding:30px; max-width:600px; width:90%; text-align:center; }
+    .start-btn { background-color: #f0b429; color:#1e1b4b; padding:15px 40px; font-size:1.2rem; font-weight:600; border:none; border-radius:50px; cursor:pointer; transition: transform 0.3s, background-color 0.3s; }
+    .start-btn:hover { transform: scale(1.1); background-color:#d49b1a; }
+    .quiz-btn { transition: all 0.2s; }
+    .quiz-btn:hover { background-color:#3b82f6; }
+    #next-btn { margin-top:20px; display:inline-block; }
   </style>
 </head>
 <body>
@@ -114,7 +81,17 @@
       { q: "Which library helps integrate FHE with ML models?", a: ["Concrete ML", "TFHE.js", "ZamaNet", "CryptoFHE"], c: 0 },
       { q: "Zama’s primary mission is?", a: ["Bring privacy to AI & Web3", "Build a social network", "Sell cloud storage", "Create NFTs"], c: 0 },
       { q: "FHE stands for?", a: ["Fully Homomorphic Encryption", "Fast Hash Encoding", "Federated Homomorphic Engine", "Full Hardware Encryption"], c: 0 },
-      { q: "Which Zama project is Python-based?", a: ["Concrete ML", "TFHE.rs", "ZamaJS", "MetaMask"], c: 0 }
+      { q: "Which Zama project is Python-based?", a: ["Concrete ML", "TFHE.rs", "ZamaJS", "MetaMask"], c: 0 },
+      { q: "What does “FHE” stand for in Zama’s technology?", a: ["Fully Homomorphic Encryption", "Full Hardware Encryption", "Fast Hash Encoding", "Federated Homomorphic Engine"], c: 0 },
+      { q: "Which Zama library is written in Rust?", a: ["Concrete ML", "TFHE.rs", "PyFHE", "ZamaJS"], c: 1 },
+      { q: "What is the main goal of Zama?", a: ["Encrypted computation for AI and Web3", "Decentralized storage", "Token launching platform", "Blockchain gaming"], c: 0 },
+      { q: "Concrete ML allows you to:", a: ["Train AI models on encrypted data", "Build NFTs", "Mine cryptocurrency", "Visualize blockchain"], c: 0 },
+      { q: "Which of the following is NOT a Zama project?", a: ["TFHE.rs", "Concrete ML", "Concrete Core", "MetaMask"], c: 3 },
+      { q: "Zama’s technology can best be described as:", a: ["Privacy-preserving AI", "Decentralized Storage", "Token Staking", "File Sharing"], c: 0 },
+      { q: "Which programming language is Concrete ML based on?", a: ["Python", "JavaScript", "Rust", "Go"], c: 0 },
+      { q: "Who are the main target users of Zama’s open-source tools?", a: ["AI developers and Web3 builders", "Gamers", "Graphic Designers", "NFT Collectors only"], c: 0 },
+      { q: "What is the key benefit of FHE over traditional encryption?", a: ["Computation on encrypted data", "Cheaper transactions", "Faster storage", "Data compression"], c: 0 },
+      { q: "Why is the Zama Creator Program important?", a: ["To reward creators for educational content", "To promote memes", "To sell NFTs", "To host gaming tournaments"], c: 0 }
     ];
 
     let current = 0;
@@ -137,6 +114,7 @@
         const btn = document.createElement("button");
         btn.textContent = opt;
         btn.className = "quiz-btn block w-full text-left px-4 py-3 bg-white/20 rounded-xl hover:bg-blue-500 transition-all duration-200";
+        btn.disabled = false;
         btn.addEventListener("click", () => selectAnswer(i, btn));
         optionsEl.appendChild(btn);
       });
@@ -145,19 +123,24 @@
     }
 
     function selectAnswer(i, btn) {
-      const q = quizData[current];
-      [...optionsEl.children].forEach(b => b.classList.remove("bg-blue-600","bg-red-500"));
-      if(i===q.c) btn.classList.add("bg-blue-600"); else btn.classList.add("bg-red-500");
+      if (optionsEl.dataset.selected !== null) return; // Already selected
       optionsEl.dataset.selected = i;
+      const q = quizData[current];
+
+      [...optionsEl.children].forEach((b, index) => {
+        b.disabled = true;
+        if(index === q.c) b.classList.add("bg-blue-600");
+        else if(index === i) b.classList.add("bg-red-500");
+      });
+
       nextBtn.classList.remove("hidden");
     }
 
     nextBtn.addEventListener("click", () => {
       const selected = parseInt(optionsEl.dataset.selected);
-      if(!isNaN(selected) && selected===quizData[current].c) score++;
-      [...optionsEl.children].forEach(b=>b.disabled=true);
+      if(selected === quizData[current].c) score++;
       current++;
-      if(current<quizData.length) loadQuestion();
+      if(current < quizData.length) loadQuestion();
       else showResult();
     });
 
