@@ -42,7 +42,7 @@
     </div>
     <h2 id="question" class="text-2xl font-semibold mb-4"></h2>
     <div id="options" class="space-y-3"></div>
-    <button id="next-btn" class="px-6 py-3 bg-blue-500 rounded-full hidden">Next ➡️</button>
+    <button id="next-btn" class="px-6 py-3 bg-blue-500 rounded-full">Next ➡️</button>
   </div>
 
   <!-- Result Screen -->
@@ -61,7 +61,6 @@
     const homeScreen = document.getElementById("home-screen");
     const quizContainer = document.getElementById("quiz-container");
     const resultScreen = document.getElementById("result-screen");
-    const startBtn = document.querySelector(".start-btn");
     const questionEl = document.getElementById("question");
     const optionsEl = document.getElementById("options");
     const nextBtn = document.getElementById("next-btn");
@@ -107,7 +106,7 @@
       const q = quizData[current];
       questionEl.textContent = `Q${current+1}. ${q.q}`;
       optionsEl.innerHTML = "";
-      nextBtn.classList.add("hidden");
+      nextBtn.disabled = true; // Next disabled until selection
       optionsEl.dataset.selected = null;
 
       q.a.forEach((opt, i) => {
@@ -115,25 +114,22 @@
         btn.textContent = opt;
         btn.className = "quiz-btn block w-full text-left px-4 py-3 bg-white/20 rounded-xl hover:bg-blue-500 transition-all duration-200";
         btn.disabled = false;
-        btn.addEventListener("click", () => selectAnswer(i, btn));
+
+        btn.addEventListener("click", () => {
+          optionsEl.dataset.selected = i;
+          nextBtn.disabled = false;
+
+          // Highlight selected
+          [...optionsEl.children].forEach((b, index) => {
+            b.classList.remove("bg-blue-600","bg-red-500");
+            if(index === i) b.classList.add("bg-blue-600");
+          });
+        });
+
         optionsEl.appendChild(btn);
       });
 
       progressBar.style.width = `${(current/quizData.length)*100}%`;
-    }
-
-    function selectAnswer(i, btn) {
-      if (optionsEl.dataset.selected !== null) return; // Already selected
-      optionsEl.dataset.selected = i;
-      const q = quizData[current];
-
-      [...optionsEl.children].forEach((b, index) => {
-        b.disabled = true;
-        if(index === q.c) b.classList.add("bg-blue-600");
-        else if(index === i) b.classList.add("bg-red-500");
-      });
-
-      nextBtn.classList.remove("hidden");
     }
 
     nextBtn.addEventListener("click", () => {
@@ -160,11 +156,12 @@
         allAnswersDiv.appendChild(div);
       });
       allAnswersDiv.classList.toggle("hidden");
-      setTimeout(()=>{allAnswersDiv.style.opacity=allAnswersDiv.classList.contains("hidden")?0:1;},50);
+      setTimeout(()=>{allAnswersDiv.style.opacity = allAnswersDiv.classList.contains("hidden") ? 0 : 1;},50);
     });
 
     restartBtn.addEventListener("click", ()=>{
-      current=0; score=0;
+      current = 0;
+      score = 0;
       resultScreen.classList.add("hidden");
       homeScreen.classList.remove("hidden");
       progressBar.style.width="0%";
