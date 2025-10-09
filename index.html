@@ -1,112 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zama FHE & OG NFT Quiz</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gradient-to-br from-indigo-700 via-purple-700 to-pink-600 text-white min-h-screen flex items-center justify-center font-sans">
+<script>
+const quizData = [
+  // --- তোমার সব 20টা question এখানে থাকবে ---
+];
 
-  <div id="start-screen" class="text-center">
-    <h1 class="text-4xl font-bold mb-6 drop-shadow-lg">Zama FHE & OG NFT Quiz</h1>
-    <button id="start-btn" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-full shadow-lg hover:bg-blue-600 hover:scale-105 transition-all duration-300">
-      Start Quiz 🚀
-    </button>
-  </div>
+let currentQuestion = 0;
+let score = 0;
+let selectedAnswer = null;
 
-  <div id="quiz-container" class="hidden max-w-xl w-full bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg">
-    <div id="progress-bar" class="w-full bg-white/20 h-3 rounded-full mb-6">
-      <div id="progress" class="bg-blue-400 h-3 rounded-full transition-all duration-300" style="width: 0%;"></div>
-    </div>
+const quizContainer = document.getElementById("quiz");
+const questionEl = document.getElementById("question");
+const answerButtons = document.getElementById("answer-buttons");
+const nextButton = document.getElementById("next-btn");
+const progressBar = document.getElementById("progress-bar");
 
-    <h2 id="question" class="text-2xl font-semibold mb-4"></h2>
-    <div id="options" class="space-y-3"></div>
-  </div>
+function startQuiz() {
+  currentQuestion = 0;
+  score = 0;
+  nextButton.innerHTML = "Next";
+  showQuestion();
+}
 
-  <div id="result-screen" class="hidden text-center">
-    <h2 class="text-3xl font-bold mb-4">🎉 Quiz Complete!</h2>
-    <p class="mb-6 text-lg">Great job learning about Zama & FHE!</p>
-    <button onclick="window.open('https://guild.xyz/zama', '_blank')" class="px-6 py-3 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition-all duration-300">
-      🚀 Join Zama Creator Program
-    </button>
-  </div>
+function showQuestion() {
+  resetState();
+  let currentQuizData = quizData[currentQuestion];
+  questionEl.innerHTML = `${currentQuestion + 1}. ${currentQuizData.question}`;
 
-  <script>
-    const startBtn = document.getElementById("start-btn");
-    const startScreen = document.getElementById("start-screen");
-    const quizContainer = document.getElementById("quiz-container");
-    const questionEl = document.getElementById("question");
-    const optionsEl = document.getElementById("options");
-    const resultScreen = document.getElementById("result-screen");
-    const progressBar = document.getElementById("progress");
+  currentQuizData.options.forEach((option) => {
+    const button = document.createElement("button");
+    button.innerHTML = option;
+    button.classList.add("btn");
+    button.addEventListener("click", () => selectAnswer(button, currentQuizData.correct));
+    answerButtons.appendChild(button);
+  });
 
-    const quizData = [
-      { q: "What is Zama known for?", a: ["Fully Homomorphic Encryption (FHE)", "Blockchain Mining", "NFT Minting", "Game Development"], c: 0 },
-      { q: "Which programming language is mainly used in TFHE.rs?", a: ["Python", "Rust", "C++", "Go"], c: 1 },
-      { q: "Zama focuses on which technology area?", a: ["Privacy-preserving computation", "Cloud Storage", "Social Media", "Quantum Computing"], c: 0 },
-      { q: "Concrete ML is built for which purpose?", a: ["Encrypted Machine Learning", "Game Design", "NFT Art", "Data Storage"], c: 0 },
-      { q: "Who can use Zama’s open-source libraries?", a: ["AI & Web3 Developers", "Gamers", "Artists", "Marketers"], c: 0 },
-      { q: "What does FHE allow?", a: ["Compute on encrypted data", "Decrypt before computing", "Faster data transfer", "Generate NFTs"], c: 0 },
-      { q: "Which library helps integrate FHE with ML models?", a: ["Concrete ML", "TFHE.js", "ZamaNet", "CryptoFHE"], c: 0 },
-      { q: "Zama’s primary mission is?", a: ["Bring privacy to AI & Web3", "Build a social network", "Sell cloud storage", "Create NFTs"], c: 0 },
-      { q: "FHE stands for?", a: ["Fully Homomorphic Encryption", "Fast Hash Encoding", "Federated Homomorphic Engine", "Full Hardware Encryption"], c: 0 },
-      { q: "Which Zama project is Python-based?", a: ["Concrete ML", "TFHE.rs", "ZamaJS", "MetaMask"], c: 0 },
-      { q: "What does “FHE” stand for in Zama’s technology?", a: ["Fully Homomorphic Encryption", "Full Hardware Encryption", "Fast Hash Encoding", "Federated Homomorphic Engine"], c: 0 },
-      { q: "Which Zama library is written in Rust?", a: ["Concrete ML", "TFHE.rs", "PyFHE", "ZamaJS"], c: 1 },
-      { q: "What is the main goal of Zama?", a: ["Encrypted computation for AI and Web3", "Decentralized storage", "Token launching platform", "Blockchain gaming"], c: 0 },
-      { q: "Concrete ML allows you to:", a: ["Train AI models on encrypted data", "Build NFTs", "Mine cryptocurrency", "Visualize blockchain"], c: 0 },
-      { q: "Which of the following is NOT a Zama project?", a: ["TFHE.rs", "Concrete ML", "Concrete Core", "MetaMask"], c: 3 },
-      { q: "Zama’s technology can best be described as:", a: ["Privacy-preserving AI", "Decentralized Storage", "Token Staking", "File Sharing"], c: 0 },
-      { q: "Which programming language is Concrete ML based on?", a: ["Python", "JavaScript", "Rust", "Go"], c: 0 },
-      { q: "Who are the main target users of Zama’s open-source tools?", a: ["AI developers and Web3 builders", "Gamers", "Graphic Designers", "NFT Collectors only"], c: 0 },
-      { q: "What is the key benefit of FHE over traditional encryption?", a: ["Computation on encrypted data", "Cheaper transactions", "Faster storage", "Data compression"], c: 0 },
-      { q: "Why is the Zama Creator Program important?", a: ["To reward creators for educational content", "To promote memes", "To sell NFTs", "To host gaming tournaments"], c: 0 },
-    ];
+  progressBar.style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+}
 
-    let current = 0;
+function resetState() {
+  nextButton.style.display = "none";
+  while (answerButtons.firstChild) {
+    answerButtons.removeChild(answerButtons.firstChild);
+  }
+}
 
-    startBtn.addEventListener("click", () => {
-      startScreen.classList.add("hidden");
-      quizContainer.classList.remove("hidden");
-      loadQuestion();
-    });
+function selectAnswer(button, correct) {
+  const allButtons = document.querySelectorAll(".btn");
+  allButtons.forEach(btn => {
+    btn.classList.remove("bg-blue-500", "opacity-50");
+    btn.disabled = true;
+    if (btn.innerHTML === correct) btn.classList.add("bg-green-600");
+  });
 
-    function loadQuestion() {
-      const q = quizData[current];
-      questionEl.textContent = `Q${current + 1}. ${q.q}`;
-      optionsEl.innerHTML = "";
-      q.a.forEach((opt, i) => {
-        const btn = document.createElement("button");
-        btn.textContent = opt;
-        btn.className =
-          "block w-full text-left px-4 py-3 bg-white/20 rounded-xl hover:bg-blue-500 transition-all duration-200";
-        btn.addEventListener("click", () => selectAnswer(i, btn));
-        optionsEl.appendChild(btn);
-      });
-      progressBar.style.width = `${((current) / quizData.length) * 100}%`;
-    }
+  button.classList.add("bg-blue-500");
+  selectedAnswer = button.innerHTML;
 
-    function selectAnswer(i, btn) {
-      const q = quizData[current];
-      [...optionsEl.children].forEach(b => b.disabled = true);
-      if (i === q.c) {
-        btn.classList.add("bg-blue-600");
-      } else {
-        btn.classList.add("bg-red-500");
-      }
-      setTimeout(() => {
-        current++;
-        if (current < quizData.length) loadQuestion();
-        else showResult();
-      }, 600);
-      progressBar.style.width = `${((current + 1) / quizData.length) * 100}%`;
-    }
+  if (selectedAnswer === correct) score++;
 
-    function showResult() {
-      quizContainer.classList.add("hidden");
-      resultScreen.classList.remove("hidden");
-    }
-  </script>
-</body>
-</html>
+  nextButton.style.display = "block";
+}
+
+function showScore() {
+  resetState();
+  questionEl.innerHTML = `🎉 Quiz Complete!<br>Great job learning about Zama & FHE!<br><br>Your Score: ${score}/${quizData.length}`;
+
+  const joinBtn = document.createElement("button");
+  joinBtn.innerHTML = "🚀 Join Zama Creator Program";
+  joinBtn.classList.add("btn", "mt-4", "bg-purple-600");
+  joinBtn.addEventListener("click", () => window.open("https://guild.xyz/zama", "_blank"));
+  quizContainer.appendChild(joinBtn);
+
+  const restartBtn = document.createElement("button");
+  restartBtn.innerHTML = "Restart Quiz";
+  restartBtn.classList.add("btn", "mt-2", "bg-gray-700");
+  restartBtn.addEventListener("click", startQuiz);
+  quizContainer.appendChild(restartBtn);
+
+  progressBar.style.width = "100%";
+}
+
+function handleNextButton() {
+  currentQuestion++;
+  if (currentQuestion < quizData.length) {
+    showQuestion();
+  } else {
+    showScore();
+  }
+}
+
+nextButton.addEventListener("click", () => {
+  if (selectedAnswer) {
+    handleNextButton();
+  }
+});
+
+startQuiz();
+</script>
