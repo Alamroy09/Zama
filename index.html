@@ -122,24 +122,38 @@
         optionsEl.appendChild(btn);
       });
 
-      // Progress bar color based on completion
+      // Progress bar
       progressBar.style.width = `${(current / quizData.length) * 100}%`;
-      progressBar.style.backgroundColor = `hsl(${(current / quizData.length) * 120}, 70%, 50%)`;
+      progressBar.style.backgroundColor = `hsl(${(current / quizData.length) * 220}, 70%, 50%)`;
+
+      // Reset selected
+      optionsEl.dataset.selected = null;
     }
 
     function selectAnswer(i, btn) {
       const q = quizData[current];
-      [...optionsEl.children].forEach(b => b.disabled = true);
-      if (i === q.c) {
-        btn.classList.add("bg-blue-600");
-        score++;
-      } else {
-        btn.classList.add("bg-red-500");
-      }
+
+      // Remove previous highlight
+      [...optionsEl.children].forEach(b => b.classList.remove("bg-blue-600", "bg-red-500"));
+
+      // Highlight selected
+      if (i === q.c) btn.classList.add("bg-blue-600");
+      else btn.classList.add("bg-red-500");
+
+      // Save selected
+      optionsEl.dataset.selected = i;
+
+      // Show Next button
       nextBtn.classList.remove("hidden");
     }
 
     nextBtn.addEventListener("click", () => {
+      const selected = parseInt(optionsEl.dataset.selected);
+      if (!isNaN(selected) && selected === quizData[current].c) score++;
+
+      // Lock options
+      [...optionsEl.children].forEach(b => b.disabled = true);
+
       current++;
       if (current < quizData.length) loadQuestion();
       else showResult();
@@ -151,7 +165,7 @@
       scoreText.textContent = `Your Score: ${score} / ${quizData.length}`;
       allAnswersDiv.classList.add("hidden");
       allAnswersDiv.style.opacity = 0;
-      // Final progress bar green
+
       progressBar.style.width = `100%`;
       progressBar.style.backgroundColor = `hsl(120, 70%, 50%)`;
     }
