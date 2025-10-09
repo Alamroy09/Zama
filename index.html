@@ -3,162 +3,109 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zama FHE Quiz</title>
+  <title>Zama FHE & OG NFT Quiz</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      background: linear-gradient(135deg, #0f172a, #1e3a8a, #0f172a);
-      background-attachment: fixed;
-    }
-    .selected { background-color: #2563eb !important; }
-    .progress-container {
-      height: 8px;
-      background-color: #374151;
-      border-radius: 8px;
-      overflow: hidden;
-      margin-bottom: 1rem;
-    }
-    .progress-bar {
-      height: 8px;
-      background-color: #3b82f6;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-  </style>
 </head>
-<body class="min-h-screen flex items-center justify-center text-white">
+<body class="bg-gradient-to-br from-indigo-700 via-purple-700 to-pink-600 text-white min-h-screen flex items-center justify-center font-sans">
 
-  <!-- Start Screen -->
-  <div id="start-screen" class="text-center space-y-6 bg-gray-800/70 p-10 rounded-2xl shadow-xl backdrop-blur-md">
-    <h1 class="text-4xl font-bold text-blue-400">Zama FHE Quiz</h1>
-    <p class="text-gray-300 text-lg">Test your knowledge about Zama & Fully Homomorphic Encryption 🔐</p>
-    <button onclick="startQuiz()" class="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-xl font-semibold shadow-md transition">Start Quiz</button>
+  <div id="start-screen" class="text-center">
+    <h1 class="text-4xl font-bold mb-6 drop-shadow-lg">Zama FHE & OG NFT Quiz</h1>
+    <button id="start-btn" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-full shadow-lg hover:bg-blue-600 hover:scale-105 transition-all duration-300">
+      Start Quiz 🚀
+    </button>
   </div>
 
-  <!-- Quiz Screen -->
-  <div id="quiz-screen" class="hidden w-full max-w-2xl bg-gray-800/80 p-8 rounded-2xl shadow-lg text-center backdrop-blur-md">
-    <div class="progress-container">
-      <div id="progress-bar" class="progress-bar"></div>
+  <div id="quiz-container" class="hidden max-w-xl w-full bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg">
+    <div id="progress-bar" class="w-full bg-white/20 h-3 rounded-full mb-6">
+      <div id="progress" class="bg-blue-400 h-3 rounded-full transition-all duration-300" style="width: 0%;"></div>
     </div>
-    <div id="quiz-container"></div>
-    <button id="next-btn" onclick="nextQuestion()" class="mt-6 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl font-semibold opacity-50 cursor-not-allowed">Next</button>
+
+    <h2 id="question" class="text-2xl font-semibold mb-4"></h2>
+    <div id="options" class="space-y-3"></div>
   </div>
 
-  <!-- Result Screen -->
-  <div id="result-screen" class="hidden text-center space-y-4 bg-gray-800/70 p-10 rounded-2xl shadow-lg backdrop-blur-md">
-    <h2 class="text-3xl font-bold text-blue-400">🎉 Quiz Complete!</h2>
-    <p class="text-lg text-gray-300">Great job learning about Zama & FHE!</p>
-    <p id="score-text" class="text-xl text-gray-200 font-semibold"></p>
-
-    <div class="space-x-4 mt-4">
-      <button onclick="showAnswers()" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-xl font-semibold">Show All Answers</button>
-      <button onclick="restartQuiz()" class="bg-gray-600 hover:bg-gray-700 px-6 py-3 rounded-xl font-semibold">Restart Quiz</button>
-    </div>
-
-    <div id="answers" class="hidden mt-6 bg-gray-700 p-6 rounded-xl text-left max-w-2xl mx-auto"></div>
-
-    <a href="https://guild.xyz/zama" target="_blank" class="inline-block mt-8 bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-xl font-semibold shadow-md transition">
+  <div id="result-screen" class="hidden text-center">
+    <h2 class="text-3xl font-bold mb-4">🎉 Quiz Complete!</h2>
+    <p class="mb-6 text-lg">Great job learning about Zama & FHE!</p>
+    <button onclick="window.open('https://guild.xyz/zama', '_blank')" class="px-6 py-3 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition-all duration-300">
       🚀 Join Zama Creator Program
-    </a>
+    </button>
   </div>
 
   <script>
+    const startBtn = document.getElementById("start-btn");
+    const startScreen = document.getElementById("start-screen");
+    const quizContainer = document.getElementById("quiz-container");
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const resultScreen = document.getElementById("result-screen");
+    const progressBar = document.getElementById("progress");
+
     const quizData = [
-      { question: "What does FHE stand for?", options: ["Fast Homomorphic Encryption", "Fully Homomorphic Encryption", "Fractional Homomorphic Encryption", "Fundamental Homomorphic Encryption"], answer: "Fully Homomorphic Encryption" },
-      { question: "What is the key feature of FHE?", options: ["Data must be decrypted before processing", "Computation can happen on encrypted data without decryption", "It only works for strings", "It replaces blockchain consensus mechanism"], answer: "Computation can happen on encrypted data without decryption" },
-      { question: "Which of these is a reason Zama is building FHE tooling?", options: ["To make data fully public", "To enforce centralized servers", "To make encrypted computation accessible for developers", "To eliminate encryption altogether"], answer: "To make encrypted computation accessible for developers" },
-      { question: "What is FHEVM in the Zama ecosystem?", options: ["A virtual machine for fully homomorphic execution", "A type of token", "A browser extension", "A consensus algorithm"], answer: "A virtual machine for fully homomorphic execution" },
-      { question: "On Zama’s site, how many TPS per chain are handled?", options: ["2", "10", "20", "100"], answer: "20" },
-      { question: "Which Zama library is written in Rust?", options: ["Concrete ML", "TFHE.rs", "PyFHE", "ZamaJS"], answer: "TFHE.rs" },
-      { question: "What is the main goal of Zama?", options: ["Decentralized storage", "Encrypted computation for AI and Web3", "Token launching platform", "Blockchain gaming"], answer: "Encrypted computation for AI and Web3" },
-      { question: "Concrete ML allows you to:", options: ["Train AI models on encrypted data", "Build NFTs", "Mine cryptocurrency", "Visualize blockchain"], answer: "Train AI models on encrypted data" },
-      { question: "Which of the following is NOT a Zama project?", options: ["TFHE.rs", "Concrete ML", "Concrete Core", "MetaMask"], answer: "MetaMask" },
-      { question: "Zama’s technology can best be described as:", options: ["Privacy-preserving AI", "Decentralized Storage", "Token Staking", "File Sharing"], answer: "Privacy-preserving AI" },
-      { question: "Which programming language is Concrete ML based on?", options: ["Python", "JavaScript", "Rust", "Go"], answer: "Python" },
-      { question: "Who are the main target users of Zama’s open-source tools?", options: ["AI developers and Web3 builders", "Gamers", "Graphic Designers", "NFT Collectors only"], answer: "AI developers and Web3 builders" },
-      { question: "What is the key benefit of FHE over traditional encryption?", options: ["Faster storage", "Computation on encrypted data", "Cheaper transactions", "Data compression"], answer: "Computation on encrypted data" },
-      { question: "Why is the Zama Creator Program important?", options: ["To promote memes", "To reward creators for educational content", "To sell NFTs", "To host gaming tournaments"], answer: "To reward creators for educational content" },
-      { question: "Which blockchain ecosystem integrates Zama’s FHEVM?", options: ["Ethereum", "Bitcoin", "Tezos", "Polygon"], answer: "Ethereum" },
-      { question: "What kind of encryption does Zama specialize in?", options: ["Symmetric", "Asymmetric", "Fully Homomorphic", "Hash-based"], answer: "Fully Homomorphic" },
-      { question: "Which programming language is primarily used for TFHE.rs?", options: ["Rust", "C++", "Python", "Solidity"], answer: "Rust" },
-      { question: "Which of these areas can FHE improve?", options: ["AI privacy", "Data analytics", "DeFi security", "All of the above"], answer: "All of the above" },
-      { question: "Zama’s mission is to make FHE:", options: ["Accessible to all developers", "Restricted to enterprises", "Only for research use", "Private within Zama"], answer: "Accessible to all developers" },
-      { question: "Which open-source model is Zama promoting?", options: ["Community-driven privacy computing", "Centralized AI governance", "Ad-based encryption", "Closed-source AI"], answer: "Community-driven privacy computing" }
+      { q: "What is Zama known for?", a: ["Fully Homomorphic Encryption (FHE)", "Blockchain Mining", "NFT Minting", "Game Development"], c: 0 },
+      { q: "Which programming language is mainly used in TFHE.rs?", a: ["Python", "Rust", "C++", "Go"], c: 1 },
+      { q: "Zama focuses on which technology area?", a: ["Privacy-preserving computation", "Cloud Storage", "Social Media", "Quantum Computing"], c: 0 },
+      { q: "Concrete ML is built for which purpose?", a: ["Encrypted Machine Learning", "Game Design", "NFT Art", "Data Storage"], c: 0 },
+      { q: "Who can use Zama’s open-source libraries?", a: ["AI & Web3 Developers", "Gamers", "Artists", "Marketers"], c: 0 },
+      { q: "What does FHE allow?", a: ["Compute on encrypted data", "Decrypt before computing", "Faster data transfer", "Generate NFTs"], c: 0 },
+      { q: "Which library helps integrate FHE with ML models?", a: ["Concrete ML", "TFHE.js", "ZamaNet", "CryptoFHE"], c: 0 },
+      { q: "Zama’s primary mission is?", a: ["Bring privacy to AI & Web3", "Build a social network", "Sell cloud storage", "Create NFTs"], c: 0 },
+      { q: "FHE stands for?", a: ["Fully Homomorphic Encryption", "Fast Hash Encoding", "Federated Homomorphic Engine", "Full Hardware Encryption"], c: 0 },
+      { q: "Which Zama project is Python-based?", a: ["Concrete ML", "TFHE.rs", "ZamaJS", "MetaMask"], c: 0 },
+      { q: "What does “FHE” stand for in Zama’s technology?", a: ["Fully Homomorphic Encryption", "Full Hardware Encryption", "Fast Hash Encoding", "Federated Homomorphic Engine"], c: 0 },
+      { q: "Which Zama library is written in Rust?", a: ["Concrete ML", "TFHE.rs", "PyFHE", "ZamaJS"], c: 1 },
+      { q: "What is the main goal of Zama?", a: ["Encrypted computation for AI and Web3", "Decentralized storage", "Token launching platform", "Blockchain gaming"], c: 0 },
+      { q: "Concrete ML allows you to:", a: ["Train AI models on encrypted data", "Build NFTs", "Mine cryptocurrency", "Visualize blockchain"], c: 0 },
+      { q: "Which of the following is NOT a Zama project?", a: ["TFHE.rs", "Concrete ML", "Concrete Core", "MetaMask"], c: 3 },
+      { q: "Zama’s technology can best be described as:", a: ["Privacy-preserving AI", "Decentralized Storage", "Token Staking", "File Sharing"], c: 0 },
+      { q: "Which programming language is Concrete ML based on?", a: ["Python", "JavaScript", "Rust", "Go"], c: 0 },
+      { q: "Who are the main target users of Zama’s open-source tools?", a: ["AI developers and Web3 builders", "Gamers", "Graphic Designers", "NFT Collectors only"], c: 0 },
+      { q: "What is the key benefit of FHE over traditional encryption?", a: ["Computation on encrypted data", "Cheaper transactions", "Faster storage", "Data compression"], c: 0 },
+      { q: "Why is the Zama Creator Program important?", a: ["To reward creators for educational content", "To promote memes", "To sell NFTs", "To host gaming tournaments"], c: 0 },
     ];
 
-    let currentQuestion = 0, score = 0, selectedOption = null;
-    const startScreen = document.getElementById("start-screen");
-    const quizScreen = document.getElementById("quiz-screen");
-    const resultScreen = document.getElementById("result-screen");
-    const quizContainer = document.getElementById("quiz-container");
-    const nextBtn = document.getElementById("next-btn");
-    const scoreText = document.getElementById("score-text");
-    const answersDiv = document.getElementById("answers");
-    const progressBar = document.getElementById("progress-bar");
+    let current = 0;
 
-    function startQuiz() {
+    startBtn.addEventListener("click", () => {
       startScreen.classList.add("hidden");
-      quizScreen.classList.remove("hidden");
-      currentQuestion = 0;
-      score = 0;
-      updateProgress();
-      showQuestion();
+      quizContainer.classList.remove("hidden");
+      loadQuestion();
+    });
+
+    function loadQuestion() {
+      const q = quizData[current];
+      questionEl.textContent = `Q${current + 1}. ${q.q}`;
+      optionsEl.innerHTML = "";
+      q.a.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.className =
+          "block w-full text-left px-4 py-3 bg-white/20 rounded-xl hover:bg-blue-500 transition-all duration-200";
+        btn.addEventListener("click", () => selectAnswer(i, btn));
+        optionsEl.appendChild(btn);
+      });
+      progressBar.style.width = `${((current) / quizData.length) * 100}%`;
     }
 
-    function showQuestion() {
-      const q = quizData[currentQuestion];
-      quizContainer.innerHTML = `
-        <h2 class="text-2xl font-bold mb-4">Q${currentQuestion + 1}. ${q.question}</h2>
-        <div class="space-y-3">
-          ${q.options.map(opt => `
-            <button class="option w-full bg-gray-700 hover:bg-gray-600 px-4 py-3 rounded-xl text-left transition"
-              onclick="selectOption(this)">${opt}</button>`).join("")}
-        </div>
-      `;
-      selectedOption = null;
-      nextBtn.disabled = true;
-      nextBtn.classList.add("opacity-50", "cursor-not-allowed");
-      updateProgress();
-    }
-
-    function selectOption(btn) {
-      document.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
-      btn.classList.add("selected");
-      selectedOption = btn.innerText;
-      nextBtn.disabled = false;
-      nextBtn.classList.remove("opacity-50", "cursor-not-allowed");
-    }
-
-    function nextQuestion() {
-      if (!selectedOption) return;
-      if (selectedOption === quizData[currentQuestion].answer) score++;
-      currentQuestion++;
-      if (currentQuestion < quizData.length) showQuestion(); else showResult();
-    }
-
-    function updateProgress() {
-      progressBar.style.width = `${(currentQuestion / quizData.length) * 100}%`;
+    function selectAnswer(i, btn) {
+      const q = quizData[current];
+      [...optionsEl.children].forEach(b => b.disabled = true);
+      if (i === q.c) {
+        btn.classList.add("bg-blue-600");
+      } else {
+        btn.classList.add("bg-red-500");
+      }
+      setTimeout(() => {
+        current++;
+        if (current < quizData.length) loadQuestion();
+        else showResult();
+      }, 600);
+      progressBar.style.width = `${((current + 1) / quizData.length) * 100}%`;
     }
 
     function showResult() {
-      quizScreen.classList.add("hidden");
+      quizContainer.classList.add("hidden");
       resultScreen.classList.remove("hidden");
-      progressBar.style.width = "100%";
-      scoreText.innerText = `Your Score: ${score} / ${quizData.length}`;
-    }
-
-    function showAnswers() {
-      answersDiv.innerHTML = quizData.map((q, i) =>
-        `<p class='mb-2'><strong>Q${i + 1}:</strong> ${q.question}<br>✅ <em>${q.answer}</em></p>`
-      ).join("");
-      answersDiv.classList.remove("hidden");
-    }
-
-    function restartQuiz() {
-      resultScreen.classList.add("hidden");
-      answersDiv.classList.add("hidden");
-      startScreen.classList.remove("hidden");
-      progressBar.style.width = "0%";
     }
   </script>
 </body>
