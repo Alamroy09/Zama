@@ -5,9 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zama FHE & OG NFT Quiz</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    #all-answers {
+      transition: opacity 0.5s ease;
+    }
+  </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-700 via-purple-700 to-pink-600 text-white min-h-screen flex items-center justify-center font-sans">
 
+  <!-- Start Screen -->
   <div id="start-screen" class="text-center">
     <h1 class="text-4xl font-bold mb-6 drop-shadow-lg">Zama FHE & OG NFT Quiz</h1>
     <button id="start-btn" class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-full shadow-lg hover:bg-blue-600 hover:scale-105 transition-all duration-300">
@@ -15,6 +21,7 @@
     </button>
   </div>
 
+  <!-- Quiz Container -->
   <div id="quiz-container" class="hidden max-w-xl w-full bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg">
     <div id="progress-bar" class="w-full bg-white/20 h-3 rounded-full mb-6">
       <div id="progress" class="bg-blue-400 h-3 rounded-full transition-all duration-300" style="width: 0%;"></div>
@@ -23,17 +30,35 @@
     <h2 id="question" class="text-2xl font-semibold mb-4"></h2>
     <div id="options" class="space-y-3"></div>
 
-    <button id="next-btn" class="hidden mt-4 px-6 py-3 bg-blue-500 rounded-full hover:bg-blue-600 transition-all duration-300">
-      Next ➡️
-    </button>
+    <!-- Centered Next Button -->
+    <div class="flex justify-center mt-4">
+      <button id="next-btn" class="hidden px-6 py-3 bg-blue-500 rounded-full hover:bg-blue-600 transition-all duration-300">
+        Next ➡️
+      </button>
+    </div>
   </div>
 
-  <div id="result-screen" class="hidden text-center">
+  <!-- Result Screen -->
+  <div id="result-screen" class="hidden text-center max-w-xl w-full bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg">
     <h2 class="text-3xl font-bold mb-4">🎉 Quiz Complete!</h2>
-    <p class="mb-6 text-lg">Great job learning about Zama & FHE!</p>
-    <button onclick="window.open('https://guild.xyz/zama', '_blank')" class="px-6 py-3 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition-all duration-300">
-      🚀 Join Zama Creator Program
-    </button>
+    <p class="mb-2 text-lg" id="score-text"></p>
+    
+    <div class="space-y-3">
+      <button onclick="window.open('https://guild.xyz/zama', '_blank')" class="w-full px-6 py-3 bg-green-500 text-white font-semibold rounded-full hover:bg-green-600 transition-all duration-300">
+        🚀 Join Zama Creator Program
+      </button>
+      <button id="show-answers-btn" class="w-full px-6 py-3 bg-yellow-500 text-white font-semibold rounded-full hover:bg-yellow-600 transition-all duration-300">
+        📖 Show All Answers
+      </button>
+      <button id="restart-btn" class="w-full px-6 py-3 bg-blue-500 text-white font-semibold rounded-full hover:bg-blue-600 transition-all duration-300">
+        🔄 Restart Quiz
+      </button>
+    </div>
+
+    <!-- Answers Section -->
+    <div id="all-answers" class="mt-4 text-left hidden bg-white/20 p-4 rounded-lg max-h-64 overflow-y-auto opacity-0">
+      <!-- Answers will appear here -->
+    </div>
   </div>
 
   <script>
@@ -45,6 +70,10 @@
     const resultScreen = document.getElementById("result-screen");
     const progressBar = document.getElementById("progress");
     const nextBtn = document.getElementById("next-btn");
+    const showAnswersBtn = document.getElementById("show-answers-btn");
+    const restartBtn = document.getElementById("restart-btn");
+    const allAnswersDiv = document.getElementById("all-answers");
+    const scoreText = document.getElementById("score-text");
 
     const quizData = [
       { q: "What is Zama known for?", a: ["Fully Homomorphic Encryption (FHE)", "Blockchain Mining", "NFT Minting", "Game Development"], c: 0 },
@@ -70,6 +99,7 @@
     ];
 
     let current = 0;
+    let score = 0;
 
     startBtn.addEventListener("click", () => {
       startScreen.classList.add("hidden");
@@ -81,7 +111,7 @@
       const q = quizData[current];
       questionEl.textContent = `Q${current + 1}. ${q.q}`;
       optionsEl.innerHTML = "";
-      nextBtn.classList.add("hidden"); // hide Next button initially
+      nextBtn.classList.add("hidden");
 
       q.a.forEach((opt, i) => {
         const btn = document.createElement("button");
@@ -92,7 +122,9 @@
         optionsEl.appendChild(btn);
       });
 
+      // Progress bar color based on completion
       progressBar.style.width = `${(current / quizData.length) * 100}%`;
+      progressBar.style.backgroundColor = `hsl(${(current / quizData.length) * 120}, 70%, 50%)`;
     }
 
     function selectAnswer(i, btn) {
@@ -100,23 +132,51 @@
       [...optionsEl.children].forEach(b => b.disabled = true);
       if (i === q.c) {
         btn.classList.add("bg-blue-600");
+        score++;
       } else {
         btn.classList.add("bg-red-500");
       }
-      nextBtn.classList.remove("hidden"); // show Next button
+      nextBtn.classList.remove("hidden");
     }
 
     nextBtn.addEventListener("click", () => {
       current++;
       if (current < quizData.length) loadQuestion();
       else showResult();
-      progressBar.style.width = `${(current / quizData.length) * 100}%`;
     });
 
     function showResult() {
       quizContainer.classList.add("hidden");
       resultScreen.classList.remove("hidden");
+      scoreText.textContent = `Your Score: ${score} / ${quizData.length}`;
+      allAnswersDiv.classList.add("hidden");
+      allAnswersDiv.style.opacity = 0;
+      // Final progress bar green
+      progressBar.style.width = `100%`;
+      progressBar.style.backgroundColor = `hsl(120, 70%, 50%)`;
     }
+
+    showAnswersBtn.addEventListener("click", () => {
+      allAnswersDiv.innerHTML = "";
+      quizData.forEach((q, idx) => {
+        const div = document.createElement("div");
+        div.innerHTML = `<strong>Q${idx+1}:</strong> ${q.q}<br><strong>Answer:</strong> ${q.a[q.c]}<hr class="my-2 border-white/30">`;
+        allAnswersDiv.appendChild(div);
+      });
+      allAnswersDiv.classList.toggle("hidden");
+      setTimeout(() => {
+        allAnswersDiv.style.opacity = allAnswersDiv.classList.contains("hidden") ? 0 : 1;
+      }, 50);
+    });
+
+    restartBtn.addEventListener("click", () => {
+      current = 0;
+      score = 0;
+      resultScreen.classList.add("hidden");
+      startScreen.classList.remove("hidden");
+      progressBar.style.width = `0%`;
+      progressBar.style.backgroundColor = `hsl(220, 70%, 50%)`;
+    });
   </script>
 </body>
 </html>
