@@ -5,8 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zama FHE Quiz</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .selected { background-color: #2563eb !important; }
+    .progress-container {
+      height: 8px;
+      background-color: #374151;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .progress-bar {
+      height: 8px;
+      background-color: #3b82f6;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white flex items-center justify-center min-h-screen">
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white flex items-center justify-center min-h-screen">
 
   <!-- Start Screen -->
   <div id="start-screen" class="text-center space-y-6">
@@ -17,8 +33,11 @@
 
   <!-- Quiz Screen -->
   <div id="quiz-screen" class="hidden w-full max-w-2xl bg-gray-800 p-8 rounded-2xl shadow-lg text-center">
+    <div class="progress-container">
+      <div id="progress-bar" class="progress-bar"></div>
+    </div>
     <div id="quiz-container"></div>
-    <button id="next-btn" onclick="nextQuestion()" class="mt-6 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl font-semibold">Next</button>
+    <button id="next-btn" onclick="nextQuestion()" class="mt-6 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl font-semibold opacity-50 cursor-not-allowed">Next</button>
   </div>
 
   <!-- Result Screen -->
@@ -46,7 +65,6 @@
       { question: "Which of these is a reason Zama is building FHE tooling?", options: ["To make data fully public", "To enforce centralized servers", "To make encrypted computation accessible for developers", "To eliminate encryption altogether"], answer: "To make encrypted computation accessible for developers" },
       { question: "What is FHEVM in the Zama ecosystem?", options: ["A virtual machine for fully homomorphic execution", "A type of token", "A browser extension", "A consensus algorithm"], answer: "A virtual machine for fully homomorphic execution" },
       { question: "On Zama’s site, how many TPS per chain are handled?", options: ["2", "10", "20", "100"], answer: "20" },
-      { question: "What does “FHE” stand for in Zama’s technology?", options: ["Fully Homomorphic Encryption", "Full Hardware Encryption", "Fast Hash Encoding", "Federated Homomorphic Engine"], answer: "Fully Homomorphic Encryption" },
       { question: "Which Zama library is written in Rust?", options: ["Concrete ML", "TFHE.rs", "PyFHE", "ZamaJS"], answer: "TFHE.rs" },
       { question: "What is the main goal of Zama?", options: ["Decentralized storage", "Encrypted computation for AI and Web3", "Token launching platform", "Blockchain gaming"], answer: "Encrypted computation for AI and Web3" },
       { question: "Concrete ML allows you to:", options: ["Train AI models on encrypted data", "Build NFTs", "Mine cryptocurrency", "Visualize blockchain"], answer: "Train AI models on encrypted data" },
@@ -74,12 +92,14 @@
     const nextBtn = document.getElementById("next-btn");
     const scoreText = document.getElementById("score-text");
     const answersDiv = document.getElementById("answers");
+    const progressBar = document.getElementById("progress-bar");
 
     function startQuiz() {
       startScreen.classList.add("hidden");
       quizScreen.classList.remove("hidden");
       currentQuestion = 0;
       score = 0;
+      updateProgress();
       showQuestion();
     }
 
@@ -88,19 +108,20 @@
       quizContainer.innerHTML = `
         <h2 class="text-2xl font-bold mb-4">Q${currentQuestion + 1}. ${q.question}</h2>
         <div class="space-y-3">
-          ${q.options.map((opt) => `
-            <button class="option w-full bg-gray-700 hover:bg-gray-600 px-4 py-3 rounded-xl text-left"
+          ${q.options.map(opt => `
+            <button class="option w-full bg-gray-700 hover:bg-gray-600 px-4 py-3 rounded-xl text-left transition"
               onclick="selectOption(this)">${opt}</button>`).join("")}
         </div>
       `;
       selectedOption = null;
       nextBtn.disabled = true;
       nextBtn.classList.add("opacity-50", "cursor-not-allowed");
+      updateProgress();
     }
 
     function selectOption(button) {
-      document.querySelectorAll(".option").forEach((btn) => btn.classList.remove("bg-blue-600"));
-      button.classList.add("bg-blue-600");
+      document.querySelectorAll(".option").forEach(btn => btn.classList.remove("selected"));
+      button.classList.add("selected");
       selectedOption = button.innerText;
       nextBtn.disabled = false;
       nextBtn.classList.remove("opacity-50", "cursor-not-allowed");
@@ -117,9 +138,15 @@
       }
     }
 
+    function updateProgress() {
+      const progress = ((currentQuestion) / quizData.length) * 100;
+      progressBar.style.width = `${progress}%`;
+    }
+
     function showResult() {
       quizScreen.classList.add("hidden");
       resultScreen.classList.remove("hidden");
+      progressBar.style.width = "100%";
       scoreText.innerText = `Your Score: ${score} / ${quizData.length}`;
     }
 
@@ -134,6 +161,7 @@
       resultScreen.classList.add("hidden");
       answersDiv.classList.add("hidden");
       startScreen.classList.remove("hidden");
+      progressBar.style.width = "0%";
     }
   </script>
 </body>
