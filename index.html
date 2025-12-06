@@ -3,190 +3,118 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Zama Project Quiz — Privacy & FHE</title>
+  <title>Zama Project — Quiz</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root{
-      --bg1:#071131;
-      --bg2:#0f172a;
-      --accent:#f59e0b;
-      --card: rgba(255,255,255,0.04);
+      --card-bg: rgba(255,255,255,0.04);
+      --glass: rgba(255,255,255,0.03);
     }
     body{
-      margin:0;
-      min-height:100vh;
-      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background: linear-gradient(135deg, var(--bg1), #0b1f3a 40%, #08243f 100%);
+      font-family: Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      margin:0; min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(ellipse at top left, #071029 0%, #0f172a 40%, #071029 100%);
       color: #e6eef8;
       padding:24px;
     }
-    .container{
-      width:100%;
-      max-width:960px;
-    }
-    .card{
+    .container{ width:100%; max-width:820px; }
+    .hero {
       background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      border-radius:16px;
-      padding:28px;
-      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      border-radius:16px; padding:28px;
+      box-shadow: 0 8px 30px rgba(4,6,15,0.6);
       border: 1px solid rgba(255,255,255,0.03);
     }
-    .header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:18px;
+    .title { font-size:1.375rem; font-weight:700; margin-bottom:6px; color:#fff; }
+    .subtitle { color:rgba(230,238,248,0.8); margin-bottom:18px; }
+    .start-row { display:flex; gap:12px; align-items:center; margin-top:6px; }
+    .btn { cursor:pointer; border-radius:999px; padding:12px 22px; font-weight:700; border:none; }
+    .btn-primary { background:#f59e0b; color:#07112b; box-shadow: 0 6px 20px rgba(240,154,11,0.16); }
+    .card { margin-top:18px; background: var(--card-bg); border-radius:14px; padding:22px; }
+    .q-title { font-size:1.125rem; font-weight:700; margin-bottom:12px; color:#e9f2ff; }
+    .options { display:flex; flex-direction:column; gap:12px; }
+    .option-btn {
+      text-align:left; padding:14px 16px; border-radius:12px;
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.03);
+      cursor:pointer; transition: all .15s ease;
     }
-    .title{
-      display:flex;
-      gap:12px;
-      align-items:center;
-    }
-    .logo {
-      width:44px;
-      height:44px;
-      border-radius:10px;
-      background:linear-gradient(135deg,#3b82f6,#7c3aed);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:700;
-      color:white;
-      box-shadow: 0 6px 18px rgba(59,130,246,0.12);
-    }
-    h1{ margin:0; font-size:1.25rem; letter-spacing: -0.2px; }
-    .subtitle { font-size:0.9rem; color:rgba(230,238,248,0.8) }
-
-    /* quiz area */
-    .progress-wrap{ width:100%; background: rgba(255,255,255,0.04); height:10px; border-radius:999px; overflow:hidden; margin:18px 0; }
-    .progress{ height:100%; width:0%; background: linear-gradient(90deg,#3b82f6,#7c3aed); transition:width .28s ease; }
-
-    .question{ font-size:1.125rem; margin-bottom:12px; font-weight:600; }
-    .options{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
-
-    .opt-btn{
-      text-align:left;
-      padding:12px 14px;
-      border-radius:10px;
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.03);
-      cursor:pointer;
-      transition: transform .08s, background .12s, border-color .12s;
-      font-size:0.98rem;
-    }
-    .opt-btn:hover{ transform: translateY(-3px); border-color: rgba(255,255,255,0.06); }
-    .opt-btn.selected{ background: rgba(59,130,246,0.14); border-color: rgba(59,130,246,0.25); }
-
-    .controls{
-      display:flex;
-      align-items:center;
-      justify-content:center; /* center Next button under options */
-      gap:12px;
-    }
-
-    .btn{
-      padding:10px 18px;
-      border-radius:999px;
-      cursor:pointer;
-      font-weight:700;
-      border:none;
-    }
-    .btn-primary{ background: var(--accent); color:#07112b; box-shadow: 0 8px 26px rgba(240,180,41,0.12); }
-    .btn-secondary{ background: rgba(255,255,255,0.03); color: #e6eef8; border:1px solid rgba(255,255,255,0.04); }
-
-    .small { font-size:0.86rem; color:rgba(230,238,248,0.82); }
-
-    /* result area */
-    .result-center{ text-align:center; }
-
-    /* footer badge */
-    .footer-badge{
-      position:fixed;
-      left:0; right:0; bottom:12px;
-      display:flex; justify-content:center; pointer-events:none;
-    }
-    .badge{
-      background: rgba(255,255,255,0.03);
-      color:#e6eef8;
-      padding:8px 12px;
-      border-radius:999px;
-      font-size:0.9rem;
-      pointer-events:auto;
-      border:1px solid rgba(255,255,255,0.02);
-    }
-
-    /* responsive */
-    @media (max-width:640px){
-      .card{ padding:18px; }
-      .title h1{ font-size:1rem; }
+    .option-btn:hover { transform:translateY(-3px); box-shadow: 0 8px 20px rgba(2,6,23,0.4); }
+    .option-btn.selected { border-color: rgba(99,102,241,0.9); background: rgba(99,102,241,0.06); }
+    .progress-wrap { height:8px; background: rgba(255,255,255,0.03); border-radius:999px; overflow:hidden; margin-bottom:12px; }
+    .progress-bar { height:100%; background: linear-gradient(90deg,#3b82f6,#6366f1); width:0%; transition:width .25s ease; }
+    .center-row { display:flex; justify-content:center; margin-top:18px; }
+    .meta { color: rgba(230,238,248,0.7); font-size:0.92rem; margin-top:14px; display:flex; justify-content:space-between; align-items:center; }
+    .footer-badge { position:fixed; left:0; right:0; bottom:14px; display:flex; justify-content:center; pointer-events:none; }
+    .badge { background: rgba(255,255,255,0.03); color:#eaf2ff; padding:8px 14px; border-radius:999px; pointer-events:auto; border:1px solid rgba(255,255,255,0.03); }
+    /* responsive tweaks */
+    @media (max-width:520px){
+      .title { font-size:1.125rem; }
+      .btn { padding:10px 18px; font-size:0.95rem; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="card" id="home-card">
-      <div class="header">
-        <div class="title">
-          <div class="logo">Z</div>
-          <div>
-            <h1>Zama Project — Quiz</h1>
-            <div class="subtitle">Quick quiz on Zama, FHE, and the Creator Program — test your knowledge.</div>
-          </div>
-        </div>
-        <div class="small">20 questions · Answers shown at the end</div>
-      </div>
-
-      <!-- Home / Intro -->
-      <div id="intro">
-        <p class="small">Welcome! This short quiz covers basic Zama concepts, FHE, and the Creator Program. Click start when you're ready — keep answers hidden until the end to test yourself properly.</p>
-        <div style="height:14px;"></div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn btn-primary" id="start-btn">Start Quiz</button>
-          <button class="btn btn-secondary" id="how-btn">How it works</button>
+    <!-- FRONT / HOME -->
+    <div id="home" class="hero">
+      <div style="display:flex; gap:14px; align-items:center;">
+        <div style="width:56px; height:56px; border-radius:12px; background:linear-gradient(180deg,#7c3aed,#3b82f6); display:flex; align-items:center; justify-content:center; font-weight:800; color:white; font-size:20px;">Z</div>
+        <div>
+          <div class="title">Zama Project — Quiz</div>
+          <div class="subtitle">Quick quiz on Zama, FHE, and the Creator Program. Answers are hidden until the end — test your knowledge.</div>
         </div>
       </div>
 
-      <!-- Quiz -->
-      <div id="quiz" style="display:none;">
-        <div class="progress-wrap"><div id="progressBar" class="progress"></div></div>
-        <div id="qbox">
-          <div id="questionText" class="question"></div>
-          <div id="optionsBox" class="options"></div>
+      <div class="start-row">
+        <button id="start-btn" class="btn btn-primary">Start Quiz</button>
+      </div>
+    </div>
+
+    <!-- QUIZ -->
+    <div id="quiz" class="card" style="display:none;">
+      <div class="progress-wrap" aria-hidden="true"><div id="progressBar" class="progress-bar"></div></div>
+
+      <div id="q-area">
+        <div id="q-title" class="q-title">Q1. Question text goes here</div>
+
+        <div id="options" class="options">
+          <!-- option buttons appended here -->
         </div>
 
-        <div class="controls" style="margin-top:6px;">
-          <button class="btn btn-secondary" id="prev-btn" style="display:none;">◀ Prev</button>
-          <button class="btn btn-primary" id="next-btn" disabled>Next ➡</button>
+        <div class="center-row">
+          <button id="nextBtn" class="btn btn-primary" disabled>Next ➜</button>
         </div>
-        <div style="height:8px"></div>
-        <div class="small" id="progressText"></div>
+
+        <div class="meta">
+          <div id="qcount">Question 1 / 20</div>
+          <div id="scoreHint" style="opacity:0.85">Answers will be shown at the end</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div id="result" class="card" style="display:none;">
+      <div class="q-title">Quiz Complete 🎉</div>
+      <p id="resultText" style="font-size:1rem; margin-bottom:12px; color:#eaf2ff;">Your Score: 0 / 20</p>
+
+      <div style="display:flex; gap:10px; flex-direction:column;">
+        <button id="revealBtn" class="btn" style="background:#ef4444; color:white;">Show All Answers</button>
+        <button id="retryBtn" class="btn btn-primary">Restart Quiz</button>
+        <a href="https://guild.xyz/zama/creator-program" target="_blank" class="btn" style="background:#10b981; color:white; text-align:center; text-decoration:none;">Join Zama Creator Program</a>
       </div>
 
-      <!-- Result -->
-      <div id="result" style="display:none; padding-top:8px;">
-        <div class="result-center">
-          <h2 style="margin:0 0 8px 0;">🎉 Quiz Complete</h2>
-          <p id="scoreText" class="small" style="margin-bottom:12px;"></p>
-          <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
-            <button class="btn btn-primary" id="joinBtn">Join Zama Creator Program</button>
-            <button class="btn btn-secondary" id="showAnswersBtn">Show All Answers</button>
-            <button class="btn btn-secondary" id="restartBtn">Restart Quiz</button>
-          </div>
-        </div>
-        <div id="answersList" style="margin-top:14px; display:none; border-radius:10px; padding:12px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);"></div>
-      </div>
+      <div id="allAnswers" style="margin-top:14px; display:none; color:rgba(230,238,248,0.95); font-size:0.95rem; max-height:320px; overflow:auto; padding-top:10px;"></div>
     </div>
   </div>
 
-  <div class="footer-badge"><div class="badge">Build by Rubel</div></div>
+  <div class="footer-badge">
+    <div class="badge">Build by Rubel</div>
+  </div>
 
   <script>
-    // Questions: first 15 original + 5 new ones (total 20)
+    // FULL 20 QUESTIONS (15 original-style + 5 new S5 questions)
     const quizData = [
+      // --- ORIGINAL 15 (example set) ---
       { q: "What is Zama known for?", a: ["Fully Homomorphic Encryption (FHE)", "Blockchain Mining", "NFT Minting", "Game Development"], c: 0 },
       { q: "Which programming language is mainly used in TFHE.rs?", a: ["Python", "Rust", "C++", "Go"], c: 1 },
       { q: "Zama focuses on which technology area?", a: ["Privacy-preserving computation", "Cloud Storage", "Social Media", "Quantum Computing"], c: 0 },
@@ -197,15 +125,15 @@
       { q: "Zama’s primary mission is?", a: ["Bring privacy to AI & Web3", "Build a social network", "Sell cloud storage", "Create NFTs"], c: 0 },
       { q: "FHE stands for?", a: ["Fully Homomorphic Encryption", "Fast Hash Encoding", "Federated Homomorphic Engine", "Full Hardware Encryption"], c: 0 },
       { q: "Which Zama project is Python-based?", a: ["Concrete ML", "TFHE.rs", "ZamaJS", "MetaMask"], c: 0 },
-      { q: "What does “FHE” stand for in Zama’s technology?", a: ["Fully Homomorphic Encryption", "Full Hardware Encryption", "Fast Hash Encoding", "Federated Homomorphic Engine"], c: 0 },
       { q: "Which Zama library is written in Rust?", a: ["Concrete ML", "TFHE.rs", "PyFHE", "ZamaJS"], c: 1 },
-      { q: "What is the main goal of Zama?", a: ["Encrypted computation for AI and Web3", "Decentralized storage", "Token launching platform", "Blockchain gaming"], c: 0 },
       { q: "Concrete ML allows you to:", a: ["Train AI models on encrypted data", "Build NFTs", "Mine cryptocurrency", "Visualize blockchain"], c: 0 },
       { q: "Which of the following is NOT a Zama project?", a: ["TFHE.rs", "Concrete ML", "Concrete Core", "MetaMask"], c: 3 },
+      { q: "What is the key benefit of FHE over traditional encryption?", a: ["Computation on encrypted data", "Cheaper transactions", "Faster storage", "Data compression"], c: 0 },
+      { q: "Why might enterprises like Zama's tech?", a: ["Privacy for sensitive data", "Guaranteed profits", "Faster block confirmations", "Auto airdrops"], c: 0 },
 
-      // New 5 questions provided by you earlier
+      // --- NEW 5 (Season 5 / Creator Program related) ---
       { q: "What’s the main purpose of the Zama Creator Program (Season 5)?", a: ["To promote NFTs only", "To reward creators for quality content about Zama & FHE", "To launch Zama’s gaming platform", "To increase trading volume on exchanges"], c: 1 },
-      { q: "Which of the following is not a reward in the Zama Creator Program S5?", a: ["Zama OG NFT", "Monthly prize pool", "Alpha access to Zama updates", "Free crypto trading signals"], c: 3 },
+      { q: "Which of the following is NOT a reward in the Zama Creator Program S5?", a: ["Zama OG NFT", "Monthly prize pool", "Alpha access to Zama updates", "Free crypto trading signals"], c: 3 },
       { q: "What does Zama mainly focus on building?", a: ["Meme coins", "Layer-0 messaging chain", "Privacy tech using Fully Homomorphic Encryption", "Centralized blockchain explorer"], c: 2 },
       { q: "What is required to join Season 5 of the Zama Creator Program?", a: ["KYC verification", "Holding a Zama token", "Connecting wallet + following @zama + creating original posts", "Paying a registration fee"], c: 2 },
       { q: "Why is Zama considered unique in web3 right now?", a: ["It has the highest TPS among L1 chains", "It lets smart contracts run on encrypted data", "It offers guaranteed airdrops", "It uses AI to predict market movements"], c: 1 }
@@ -214,136 +142,109 @@
     // state
     let current = 0;
     let score = 0;
-    let selectedIndex = null;
+    const total = quizData.length;
 
-    // dom
-    const startBtn = document.getElementById('start-btn');
-    const howBtn = document.getElementById('how-btn');
-    const intro = document.getElementById('intro');
+    // elements
+    const home = document.getElementById('home');
     const quiz = document.getElementById('quiz');
     const result = document.getElementById('result');
-    const questionText = document.getElementById('questionText');
-    const optionsBox = document.getElementById('optionsBox');
+    const qTitle = document.getElementById('q-title');
+    const optionsWrap = document.getElementById('options');
     const progressBar = document.getElementById('progressBar');
-    const nextBtn = document.getElementById('next-btn');
-    const prevBtn = document.getElementById('prev-btn');
-    const progressText = document.getElementById('progressText');
-    const scoreText = document.getElementById('scoreText');
-    const showAnswersBtn = document.getElementById('showAnswersBtn');
-    const restartBtn = document.getElementById('restartBtn');
-    const answersList = document.getElementById('answersList');
-    const joinBtn = document.getElementById('joinBtn');
+    const qcount = document.getElementById('qcount');
+    const startBtn = document.getElementById('start-btn');
+    const nextBtn = document.getElementById('nextBtn');
+    const resultText = document.getElementById('resultText');
+    const allAnswers = document.getElementById('allAnswers');
+    const revealBtn = document.getElementById('revealBtn');
+    const retryBtn = document.getElementById('retryBtn');
 
-    startBtn.onclick = () => { intro.style.display='none'; quiz.style.display='block'; current=0; score=0; selectedIndex=null; renderQuestion(); updateProgress(); };
-    howBtn.onclick = () => alert('Select an option then click Next. Answers are hidden until the end.');
-
-    joinBtn.onclick = () => window.open('https://guild.xyz/zama/creator-program', '_blank');
+    // start
+    startBtn.addEventListener('click', () => {
+      home.style.display = 'none';
+      quiz.style.display = 'block';
+      current = 0; score = 0;
+      renderQuestion();
+    });
 
     function renderQuestion(){
-      const q = quizData[current];
-      questionText.textContent = `Q${current+1}. ${q.q}`;
-      optionsBox.innerHTML = '';
-      selectedIndex = null;
+      const item = quizData[current];
+      qTitle.textContent = `Q${current+1}. ${item.q}`;
+      optionsWrap.innerHTML = '';
       nextBtn.disabled = true;
+      optionsWrap.dataset.selected = '';
 
-      q.a.forEach((opt, i) => {
+      item.a.forEach((opt, idx) => {
         const b = document.createElement('button');
-        b.className = 'opt-btn';
-        b.textContent = opt;
-        b.onclick = () => {
-          // highlight only, no immediate reveal
-          selectedIndex = i;
-          [...optionsBox.children].forEach(ch => ch.classList.remove('selected'));
+        b.className = 'option-btn';
+        b.type = 'button';
+        b.innerText = opt;
+        b.addEventListener('click', () => {
+          // select only, do NOT reveal correct answer now
+          [...optionsWrap.children].forEach(x => x.classList.remove('selected'));
           b.classList.add('selected');
+          optionsWrap.dataset.selected = idx;
           nextBtn.disabled = false;
-        };
-        optionsBox.appendChild(b);
+        });
+        optionsWrap.appendChild(b);
       });
 
-      // prev button visibility
-      prevBtn.style.display = current === 0 ? 'none' : 'inline-block';
-      updateProgress();
+      // update progress and count
+      const pct = Math.round((current/total)*100);
+      progressBar.style.width = pct + '%';
+      qcount.innerText = `Question ${current+1} / ${total}`;
+      // put Next button centered (already via CSS)
+      nextBtn.onclick = handleNext;
     }
 
-    nextBtn.onclick = () => {
-      // if not selected, ignore
-      if(selectedIndex === null) return;
-      // evaluate
-      if(selectedIndex === quizData[current].c) score++;
-      // move
+    function handleNext(){
+      const sel = optionsWrap.dataset.selected;
+      if(sel === '' || sel === undefined) return;
+      const s = parseInt(sel,10);
+      if(s === quizData[current].c) score++;
       current++;
-      selectedIndex = null;
-      if(current < quizData.length) {
+      if(current < total) {
         renderQuestion();
+        // scroll quiz into view on small screens for better UX
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         showResult();
       }
-    };
-
-    prevBtn.onclick = () => {
-      if(current === 0) return;
-      // user going back: decrement current and do NOT change score (score counts only final selections)
-      // To simplify, we will NOT recompute score backwards — best UX: restart to retake.
-      current--;
-      renderQuestion();
-    };
-
-    function updateProgress(){
-      const pct = Math.round((current/quizData.length)*100);
-      progressBar.style.width = pct + '%';
-      progressText.textContent = `Question ${Math.min(current+1, quizData.length)} / ${quizData.length}`;
     }
 
     function showResult(){
       quiz.style.display = 'none';
       result.style.display = 'block';
-      scoreText.textContent = `Your Score: ${score} / ${quizData.length}`;
-      answersList.style.display = 'none';
-      answersList.innerHTML = '';
-      showAnswersBtn.onclick = toggleAnswers;
-      restartBtn.onclick = restartQuiz;
-      updateProgressFull();
-      // scroll to results smoothly
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      resultText.innerText = `Your Score: ${score} / ${total}`;
+      // prepare answers but keep hidden until reveal
+      allAnswers.innerHTML = '';
+      quizData.forEach((q,i) => {
+        const div = document.createElement('div');
+        div.style.padding = '8px 0';
+        div.innerHTML = `<strong>Q${i+1}.</strong> ${q.q}<br><strong>Answer:</strong> ${q.a[q.c]}`;
+        allAnswers.appendChild(div);
+      });
+      allAnswers.style.display = 'none';
     }
 
-    function toggleAnswers(){
-      if(answersList.style.display === 'none'){
-        answersList.innerHTML = '';
-        quizData.forEach((q, idx) => {
-          const wrap = document.createElement('div');
-          wrap.style.marginBottom = '10px';
-          const ans = document.createElement('div');
-          ans.innerHTML = `<strong>Q${idx+1}:</strong> ${q.q}<br><strong>Answer:</strong> ${q.a[q.c]}`;
-          wrap.appendChild(ans);
-          answersList.appendChild(wrap);
-        });
-        answersList.style.display = 'block';
-        showAnswersBtn.textContent = 'Hide Answers';
-      } else {
-        answersList.style.display = 'none';
-        showAnswersBtn.textContent = 'Show All Answers';
-      }
-    }
+    revealBtn.addEventListener('click', () => {
+      if(allAnswers.style.display === 'none'){ allAnswers.style.display = 'block'; revealBtn.innerText = 'Hide Answers'; }
+      else { allAnswers.style.display = 'none'; revealBtn.innerText = 'Show All Answers'; }
+    });
 
-    function restartQuiz(){
-      // reset
-      current = 0; score = 0; selectedIndex = null;
+    retryBtn.addEventListener('click', () => {
       result.style.display = 'none';
-      intro.style.display = 'block';
-      quiz.style.display = 'none';
-      answersList.style.display = 'none';
+      home.style.display = 'block';
+      // reset values
+      current = 0; score = 0;
       progressBar.style.width = '0%';
-    }
+    });
 
-    function updateProgressFull(){
-      progressBar.style.width = '100%';
-      progressText.textContent = `Completed — ${quizData.length} questions`;
-    }
-
-    // disable text selection of buttons for cleaner UX
-    document.addEventListener('mousedown', e => {
-      if(e.target.classList && e.target.classList.contains('opt-btn')) e.preventDefault();
+    // keyboard support: Enter triggers Next if available
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' && quiz.style.display === 'block' && !nextBtn.disabled){
+        handleNext();
+      }
     });
   </script>
 </body>
