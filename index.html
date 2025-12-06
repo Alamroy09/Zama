@@ -14,16 +14,17 @@
     .primary { background:#f59e0b; color:#07112b }
     .option { transition: all .18s; }
     .option.selected { background:#2563eb; }
-    .option.correct { background:#10b981; }
-    .option.wrong { background:#ef4444; }
     .small { font-size:0.9rem; opacity:0.9 }
+    .footer-badge { position:fixed; left:0; right:0; bottom:10px; display:flex; justify-content:center; pointer-events:none; }
+    .answers-box { position:fixed; left:10px; bottom:60px; max-width:340px; }
   </style>
 </head>
 <body>
+
   <div class="card fade-in">
     <div id="home-screen">
       <h1 class="text-3xl font-bold mb-2">Zama S5 — Quick Quiz</h1>
-      <p class="small mb-4">5 quick questions about the Zama Creator Program (Season 5) & OG NFT. Good for sharing or embedding on a site.</p>
+      <p class="small mb-4">5 quick questions about the Zama Creator Program (Season 5) & OG NFT.</p>
       <button class="btn primary" onclick="startQuiz()">Start Quiz 🚀</button>
     </div>
 
@@ -31,27 +32,28 @@
       <div class="w-full bg-white/10 h-3 rounded-full mb-4">
         <div id="progress" class="bg-blue-400 h-3 rounded-full transition-all" style="width:0%"></div>
       </div>
+
       <h2 id="question" class="text-2xl font-semibold mb-3"></h2>
       <div id="options" class="space-y-3 mb-4"></div>
-      <div class="flex items-center gap-3">
-        <button id="next-btn" class="btn bg-white/10 px-4 py-2 rounded-full" disabled>Next ➡️</button>
-        <div id="feedback" class="small text-white/80"></div>
-      </div>
+
+      <button id="next-btn" class="btn bg-white/10 px-4 py-2 rounded-full" disabled>Next ➡️</button>
     </div>
 
     <div id="result-screen" class="hidden text-center">
       <h2 class="text-2xl font-bold mb-2">Quiz Complete 🎉</h2>
       <p id="score-text" class="mb-4 small"></p>
+
       <div class="space-y-3">
         <button onclick="window.open('https://guild.xyz/zama/creator-program','_blank')" class="btn primary w-full">Join Zama Creator Program</button>
         <button id="show-answers" class="btn w-full" style="background:#ef4444">Show Correct Answers</button>
         <button id="restart" class="btn w-full" style="background:#1f2937; color:white">Restart</button>
       </div>
+
       <div id="answers-area" class="mt-4 text-left hidden bg-white/10 p-3 rounded-lg max-h-64 overflow-y-auto small"></div>
     </div>
   </div>
 
-  <div style="position:fixed; left:0; right:0; bottom:10px; display:flex; justify-content:center; pointer-events:none;">
+  <div class="footer-badge">
     <div style="background:rgba(255,255,255,0.04); color:white; padding:8px 12px; border-radius:999px; font-size:0.9rem; pointer-events:auto;">Build by Rubel</div>
   </div>
 
@@ -110,15 +112,14 @@
     ];
 
     let current = 0, score = 0;
+
     const home = document.getElementById('home-screen');
     const quizContainer = document.getElementById('quiz-container');
     const result = document.getElementById('result-screen');
     const questionEl = document.getElementById('question');
     const optionsEl = document.getElementById('options');
-    const progressEl = document.getElementById('progress');
     const nextBtn = document.getElementById('next-btn');
-    const feedback = document.getElementById('feedback');
-    const scoreText = document.getElementById('score-text');
+    const progressEl = document.getElementById('progress');
     const answersArea = document.getElementById('answers-area');
 
     function startQuiz(){
@@ -132,76 +133,51 @@
       const q = quizData[current];
       questionEl.textContent = `Q${current+1}. ${q.q}`;
       optionsEl.innerHTML = '';
-      nextBtn.disabled = true; feedback.textContent = '';
+      nextBtn.disabled = true;
 
       q.a.forEach((opt, i) => {
         const btn = document.createElement('button');
         btn.className = 'option block w-full text-left px-4 py-3 bg-white/5 rounded-lg';
         btn.textContent = opt;
-        btn.onclick = () => selectOption(i, btn);
+        btn.onclick = () => {
+          [...optionsEl.children].forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          optionsEl.dataset.selected = i;
+          nextBtn.disabled = false;
+        };
         optionsEl.appendChild(btn);
       });
 
-      updateProgress();
+      progressEl.style.width = `${(current/quizData.length)*100}%`;
     }
 
-    function selectOption(idx, btn){
-      [...optionsEl.children].forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      nextBtn.disabled = false;
-      nextBtn.onclick = () => submitAnswer(idx);
-    }
-
-    function submitAnswer(selectedIdx){
-      const correct = quizData[current].c;
-
-      [...optionsEl.children].forEach((b, i) => {
-        b.classList.remove('selected');
-        if(i === correct) b.classList.add('correct');
-        if(i === selectedIdx && i !== correct) b.classList.add('wrong');
-        b.disabled = true;
-      });
-
-      if(selectedIdx === correct) { score++; feedback.textContent = 'Nice — correct!'; }
-      else { feedback.textContent = `Not quite — correct answer marked in green.`; }
-
-      nextBtn.disabled = true;
-
-      setTimeout(()=>{
-        current++;
-        if(current < quizData.length) loadQuestion();
-        else showResult();
-      }, 900);
-    }
-
-    function updateProgress(){
-      const pct = Math.round((current/quizData.length)*100);
-      progressEl.style.width = pct + '%';
-    }
+    nextBtn.onclick = () => {
+      const selected = parseInt(optionsEl.dataset.selected);
+      if(selected === quizData[current].c) score++;
+      current++;
+      if(current < quizData.length) loadQuestion();
+      else showResult();
+    };
 
     function showResult(){
       quizContainer.classList.add('hidden');
       result.classList.remove('hidden');
+      answersArea.classList.add('hidden');
       scoreText.textContent = `Your Score: ${score} / ${quizData.length}`;
-      answersArea.classList.add('hidden'); 
-      answersArea.innerHTML = '';
-      document.getElementById('show-answers').onclick = toggleAnswers;
-      document.getElementById('restart').onclick = startQuiz;
     }
 
-    function toggleAnswers(){
-      if(answersArea.classList.contains('hidden')){
-        answersArea.innerHTML = '';
-        quizData.forEach((q, idx) => {
-          const div = document.createElement('div');
-          div.innerHTML = `<strong>Q${idx+1}:</strong> ${q.q}<br><strong>Answer:</strong> ${q.a[q.c]}<hr class='my-2 border-white/20'>`;
-          answersArea.appendChild(div);
-        });
-        answersArea.classList.remove('hidden');
-      } else {
-        answersArea.classList.add('hidden');
-      }
-    }
+    document.getElementById('show-answers').onclick = () => {
+      answersArea.innerHTML = '';
+      quizData.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.innerHTML = `<strong>Q${idx+1}:</strong> ${q.q}<br><strong>Answer:</strong> ${q.a[q.c]}<hr class='my-2 border-white/20'>`;
+        answersArea.appendChild(div);
+      });
+      answersArea.classList.toggle('hidden');
+    };
+
+    document.getElementById('restart').onclick = startQuiz;
   </script>
+
 </body>
 </html>
