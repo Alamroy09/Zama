@@ -1,183 +1,350 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zama S5 — FHE & OG NFT Quiz</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Zama Project Quiz — Privacy & FHE</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { font-family: 'Poppins', sans-serif; margin:0; min-height:100vh; display:flex; justify-content:center; align-items:center; background:linear-gradient(135deg,#0f172a,#3b82f6); color:white }
-    .card { background: rgba(255,255,255,0.06); backdrop-filter: blur(6px); border-radius:16px; padding:28px; max-width:720px; width:92%; }
-    .fade-in { animation: fadeIn .6s ease forwards } 
-    @keyframes fadeIn { from {opacity:0; transform:translateY(12px)} to {opacity:1; transform:none} }
-    .btn { cursor:pointer; border-radius:999px; padding:10px 20px; font-weight:600 }
-    .primary { background:#f59e0b; color:#07112b }
-    .option { transition: all .18s; }
-    .option.selected { background:#2563eb; }
-    .small { font-size:0.9rem; opacity:0.9 }
-    .footer-badge { position:fixed; left:0; right:0; bottom:10px; display:flex; justify-content:center; pointer-events:none; }
-    .answers-box { position:fixed; left:10px; bottom:60px; max-width:340px; }
+    :root{
+      --bg1:#071131;
+      --bg2:#0f172a;
+      --accent:#f59e0b;
+      --card: rgba(255,255,255,0.04);
+    }
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: linear-gradient(135deg, var(--bg1), #0b1f3a 40%, #08243f 100%);
+      color: #e6eef8;
+      padding:24px;
+    }
+    .container{
+      width:100%;
+      max-width:960px;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border-radius:16px;
+      padding:28px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    .header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .title{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo {
+      width:44px;
+      height:44px;
+      border-radius:10px;
+      background:linear-gradient(135deg,#3b82f6,#7c3aed);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      color:white;
+      box-shadow: 0 6px 18px rgba(59,130,246,0.12);
+    }
+    h1{ margin:0; font-size:1.25rem; letter-spacing: -0.2px; }
+    .subtitle { font-size:0.9rem; color:rgba(230,238,248,0.8) }
+
+    /* quiz area */
+    .progress-wrap{ width:100%; background: rgba(255,255,255,0.04); height:10px; border-radius:999px; overflow:hidden; margin:18px 0; }
+    .progress{ height:100%; width:0%; background: linear-gradient(90deg,#3b82f6,#7c3aed); transition:width .28s ease; }
+
+    .question{ font-size:1.125rem; margin-bottom:12px; font-weight:600; }
+    .options{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
+
+    .opt-btn{
+      text-align:left;
+      padding:12px 14px;
+      border-radius:10px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.03);
+      cursor:pointer;
+      transition: transform .08s, background .12s, border-color .12s;
+      font-size:0.98rem;
+    }
+    .opt-btn:hover{ transform: translateY(-3px); border-color: rgba(255,255,255,0.06); }
+    .opt-btn.selected{ background: rgba(59,130,246,0.14); border-color: rgba(59,130,246,0.25); }
+
+    .controls{
+      display:flex;
+      align-items:center;
+      justify-content:center; /* center Next button under options */
+      gap:12px;
+    }
+
+    .btn{
+      padding:10px 18px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:700;
+      border:none;
+    }
+    .btn-primary{ background: var(--accent); color:#07112b; box-shadow: 0 8px 26px rgba(240,180,41,0.12); }
+    .btn-secondary{ background: rgba(255,255,255,0.03); color: #e6eef8; border:1px solid rgba(255,255,255,0.04); }
+
+    .small { font-size:0.86rem; color:rgba(230,238,248,0.82); }
+
+    /* result area */
+    .result-center{ text-align:center; }
+
+    /* footer badge */
+    .footer-badge{
+      position:fixed;
+      left:0; right:0; bottom:12px;
+      display:flex; justify-content:center; pointer-events:none;
+    }
+    .badge{
+      background: rgba(255,255,255,0.03);
+      color:#e6eef8;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:0.9rem;
+      pointer-events:auto;
+      border:1px solid rgba(255,255,255,0.02);
+    }
+
+    /* responsive */
+    @media (max-width:640px){
+      .card{ padding:18px; }
+      .title h1{ font-size:1rem; }
+    }
   </style>
 </head>
 <body>
-
-  <div class="card fade-in">
-    <div id="home-screen">
-      <h1 class="text-3xl font-bold mb-2">Zama S5 — Quick Quiz</h1>
-      <p class="small mb-4">5 quick questions about the Zama Creator Program (Season 5) & OG NFT.</p>
-      <button class="btn primary" onclick="startQuiz()">Start Quiz 🚀</button>
-    </div>
-
-    <div id="quiz-container" class="hidden">
-      <div class="w-full bg-white/10 h-3 rounded-full mb-4">
-        <div id="progress" class="bg-blue-400 h-3 rounded-full transition-all" style="width:0%"></div>
+  <div class="container">
+    <div class="card" id="home-card">
+      <div class="header">
+        <div class="title">
+          <div class="logo">Z</div>
+          <div>
+            <h1>Zama Project — Quiz</h1>
+            <div class="subtitle">Quick quiz on Zama, FHE, and the Creator Program — test your knowledge.</div>
+          </div>
+        </div>
+        <div class="small">20 questions · Answers shown at the end</div>
       </div>
 
-      <h2 id="question" class="text-2xl font-semibold mb-3"></h2>
-      <div id="options" class="space-y-3 mb-4"></div>
-
-      <button id="next-btn" class="btn bg-white/10 px-4 py-2 rounded-full" disabled>Next ➡️</button>
-    </div>
-
-    <div id="result-screen" class="hidden text-center">
-      <h2 class="text-2xl font-bold mb-2">Quiz Complete 🎉</h2>
-      <p id="score-text" class="mb-4 small"></p>
-
-      <div class="space-y-3">
-        <button onclick="window.open('https://guild.xyz/zama/creator-program','_blank')" class="btn primary w-full">Join Zama Creator Program</button>
-        <button id="show-answers" class="btn w-full" style="background:#ef4444">Show Correct Answers</button>
-        <button id="restart" class="btn w-full" style="background:#1f2937; color:white">Restart</button>
+      <!-- Home / Intro -->
+      <div id="intro">
+        <p class="small">Welcome! This short quiz covers basic Zama concepts, FHE, and the Creator Program. Click start when you're ready — keep answers hidden until the end to test yourself properly.</p>
+        <div style="height:14px;"></div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-primary" id="start-btn">Start Quiz</button>
+          <button class="btn btn-secondary" id="how-btn">How it works</button>
+        </div>
       </div>
 
-      <div id="answers-area" class="mt-4 text-left hidden bg-white/10 p-3 rounded-lg max-h-64 overflow-y-auto small"></div>
+      <!-- Quiz -->
+      <div id="quiz" style="display:none;">
+        <div class="progress-wrap"><div id="progressBar" class="progress"></div></div>
+        <div id="qbox">
+          <div id="questionText" class="question"></div>
+          <div id="optionsBox" class="options"></div>
+        </div>
+
+        <div class="controls" style="margin-top:6px;">
+          <button class="btn btn-secondary" id="prev-btn" style="display:none;">◀ Prev</button>
+          <button class="btn btn-primary" id="next-btn" disabled>Next ➡</button>
+        </div>
+        <div style="height:8px"></div>
+        <div class="small" id="progressText"></div>
+      </div>
+
+      <!-- Result -->
+      <div id="result" style="display:none; padding-top:8px;">
+        <div class="result-center">
+          <h2 style="margin:0 0 8px 0;">🎉 Quiz Complete</h2>
+          <p id="scoreText" class="small" style="margin-bottom:12px;"></p>
+          <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+            <button class="btn btn-primary" id="joinBtn">Join Zama Creator Program</button>
+            <button class="btn btn-secondary" id="showAnswersBtn">Show All Answers</button>
+            <button class="btn btn-secondary" id="restartBtn">Restart Quiz</button>
+          </div>
+        </div>
+        <div id="answersList" style="margin-top:14px; display:none; border-radius:10px; padding:12px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);"></div>
+      </div>
     </div>
   </div>
 
-  <div class="footer-badge">
-    <div style="background:rgba(255,255,255,0.04); color:white; padding:8px 12px; border-radius:999px; font-size:0.9rem; pointer-events:auto;">Build by Rubel</div>
-  </div>
+  <div class="footer-badge"><div class="badge">Build by Rubel</div></div>
 
   <script>
+    // Questions: first 15 original + 5 new ones (total 20)
     const quizData = [
-      {
-        q: "What’s the main purpose of the Zama Creator Program (Season 5)?",
-        a: [
-          "To promote NFTs only",
-          "To reward creators for quality content about Zama & FHE",
-          "To launch Zama’s gaming platform",
-          "To increase trading volume on exchanges"
-        ],
-        c: 1
-      },
-      {
-        q: "Which of the following is not a reward in the Zama Creator Program S5?",
-        a: [
-          "Zama OG NFT",
-          "Monthly prize pool",
-          "Alpha access to Zama updates",
-          "Free crypto trading signals"
-        ],
-        c: 3
-      },
-      {
-        q: "What does Zama mainly focus on building?",
-        a: [
-          "Meme coins",
-          "Layer-0 messaging chain",
-          "Privacy tech using Fully Homomorphic Encryption",
-          "Centralized blockchain explorer"
-        ],
-        c: 2
-      },
-      {
-        q: "What is required to join Season 5 of the Zama Creator Program?",
-        a: [
-          "KYC verification",
-          "Holding a Zama token",
-          "Connecting wallet + following @zama + creating original posts",
-          "Paying a registration fee"
-        ],
-        c: 2
-      },
-      {
-        q: "Why is Zama considered unique in web3 right now?",
-        a: [
-          "It has the highest TPS among L1 chains",
-          "It lets smart contracts run on encrypted data",
-          "It offers guaranteed airdrops",
-          "It uses AI to predict market movements"
-        ],
-        c: 1
-      }
+      { q: "What is Zama known for?", a: ["Fully Homomorphic Encryption (FHE)", "Blockchain Mining", "NFT Minting", "Game Development"], c: 0 },
+      { q: "Which programming language is mainly used in TFHE.rs?", a: ["Python", "Rust", "C++", "Go"], c: 1 },
+      { q: "Zama focuses on which technology area?", a: ["Privacy-preserving computation", "Cloud Storage", "Social Media", "Quantum Computing"], c: 0 },
+      { q: "Concrete ML is built for which purpose?", a: ["Encrypted Machine Learning", "Game Design", "NFT Art", "Data Storage"], c: 0 },
+      { q: "Who can use Zama’s open-source libraries?", a: ["AI & Web3 Developers", "Gamers", "Artists", "Marketers"], c: 0 },
+      { q: "What does FHE allow?", a: ["Compute on encrypted data", "Decrypt before computing", "Faster data transfer", "Generate NFTs"], c: 0 },
+      { q: "Which library helps integrate FHE with ML models?", a: ["Concrete ML", "TFHE.js", "ZamaNet", "CryptoFHE"], c: 0 },
+      { q: "Zama’s primary mission is?", a: ["Bring privacy to AI & Web3", "Build a social network", "Sell cloud storage", "Create NFTs"], c: 0 },
+      { q: "FHE stands for?", a: ["Fully Homomorphic Encryption", "Fast Hash Encoding", "Federated Homomorphic Engine", "Full Hardware Encryption"], c: 0 },
+      { q: "Which Zama project is Python-based?", a: ["Concrete ML", "TFHE.rs", "ZamaJS", "MetaMask"], c: 0 },
+      { q: "What does “FHE” stand for in Zama’s technology?", a: ["Fully Homomorphic Encryption", "Full Hardware Encryption", "Fast Hash Encoding", "Federated Homomorphic Engine"], c: 0 },
+      { q: "Which Zama library is written in Rust?", a: ["Concrete ML", "TFHE.rs", "PyFHE", "ZamaJS"], c: 1 },
+      { q: "What is the main goal of Zama?", a: ["Encrypted computation for AI and Web3", "Decentralized storage", "Token launching platform", "Blockchain gaming"], c: 0 },
+      { q: "Concrete ML allows you to:", a: ["Train AI models on encrypted data", "Build NFTs", "Mine cryptocurrency", "Visualize blockchain"], c: 0 },
+      { q: "Which of the following is NOT a Zama project?", a: ["TFHE.rs", "Concrete ML", "Concrete Core", "MetaMask"], c: 3 },
+
+      // New 5 questions provided by you earlier
+      { q: "What’s the main purpose of the Zama Creator Program (Season 5)?", a: ["To promote NFTs only", "To reward creators for quality content about Zama & FHE", "To launch Zama’s gaming platform", "To increase trading volume on exchanges"], c: 1 },
+      { q: "Which of the following is not a reward in the Zama Creator Program S5?", a: ["Zama OG NFT", "Monthly prize pool", "Alpha access to Zama updates", "Free crypto trading signals"], c: 3 },
+      { q: "What does Zama mainly focus on building?", a: ["Meme coins", "Layer-0 messaging chain", "Privacy tech using Fully Homomorphic Encryption", "Centralized blockchain explorer"], c: 2 },
+      { q: "What is required to join Season 5 of the Zama Creator Program?", a: ["KYC verification", "Holding a Zama token", "Connecting wallet + following @zama + creating original posts", "Paying a registration fee"], c: 2 },
+      { q: "Why is Zama considered unique in web3 right now?", a: ["It has the highest TPS among L1 chains", "It lets smart contracts run on encrypted data", "It offers guaranteed airdrops", "It uses AI to predict market movements"], c: 1 }
     ];
 
-    let current = 0, score = 0;
+    // state
+    let current = 0;
+    let score = 0;
+    let selectedIndex = null;
 
-    const home = document.getElementById('home-screen');
-    const quizContainer = document.getElementById('quiz-container');
-    const result = document.getElementById('result-screen');
-    const questionEl = document.getElementById('question');
-    const optionsEl = document.getElementById('options');
+    // dom
+    const startBtn = document.getElementById('start-btn');
+    const howBtn = document.getElementById('how-btn');
+    const intro = document.getElementById('intro');
+    const quiz = document.getElementById('quiz');
+    const result = document.getElementById('result');
+    const questionText = document.getElementById('questionText');
+    const optionsBox = document.getElementById('optionsBox');
+    const progressBar = document.getElementById('progressBar');
     const nextBtn = document.getElementById('next-btn');
-    const progressEl = document.getElementById('progress');
-    const answersArea = document.getElementById('answers-area');
+    const prevBtn = document.getElementById('prev-btn');
+    const progressText = document.getElementById('progressText');
+    const scoreText = document.getElementById('scoreText');
+    const showAnswersBtn = document.getElementById('showAnswersBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const answersList = document.getElementById('answersList');
+    const joinBtn = document.getElementById('joinBtn');
 
-    function startQuiz(){
-      home.classList.add('hidden');
-      result.classList.add('hidden');
-      quizContainer.classList.remove('hidden');
-      current = 0; score = 0; loadQuestion();
-    }
+    startBtn.onclick = () => { intro.style.display='none'; quiz.style.display='block'; current=0; score=0; selectedIndex=null; renderQuestion(); updateProgress(); };
+    howBtn.onclick = () => alert('Select an option then click Next. Answers are hidden until the end.');
 
-    function loadQuestion(){
+    joinBtn.onclick = () => window.open('https://guild.xyz/zama/creator-program', '_blank');
+
+    function renderQuestion(){
       const q = quizData[current];
-      questionEl.textContent = `Q${current+1}. ${q.q}`;
-      optionsEl.innerHTML = '';
+      questionText.textContent = `Q${current+1}. ${q.q}`;
+      optionsBox.innerHTML = '';
+      selectedIndex = null;
       nextBtn.disabled = true;
 
       q.a.forEach((opt, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'option block w-full text-left px-4 py-3 bg-white/5 rounded-lg';
-        btn.textContent = opt;
-        btn.onclick = () => {
-          [...optionsEl.children].forEach(b => b.classList.remove('selected'));
-          btn.classList.add('selected');
-          optionsEl.dataset.selected = i;
+        const b = document.createElement('button');
+        b.className = 'opt-btn';
+        b.textContent = opt;
+        b.onclick = () => {
+          // highlight only, no immediate reveal
+          selectedIndex = i;
+          [...optionsBox.children].forEach(ch => ch.classList.remove('selected'));
+          b.classList.add('selected');
           nextBtn.disabled = false;
         };
-        optionsEl.appendChild(btn);
+        optionsBox.appendChild(b);
       });
 
-      progressEl.style.width = `${(current/quizData.length)*100}%`;
+      // prev button visibility
+      prevBtn.style.display = current === 0 ? 'none' : 'inline-block';
+      updateProgress();
     }
 
     nextBtn.onclick = () => {
-      const selected = parseInt(optionsEl.dataset.selected);
-      if(selected === quizData[current].c) score++;
+      // if not selected, ignore
+      if(selectedIndex === null) return;
+      // evaluate
+      if(selectedIndex === quizData[current].c) score++;
+      // move
       current++;
-      if(current < quizData.length) loadQuestion();
-      else showResult();
+      selectedIndex = null;
+      if(current < quizData.length) {
+        renderQuestion();
+      } else {
+        showResult();
+      }
     };
 
-    function showResult(){
-      quizContainer.classList.add('hidden');
-      result.classList.remove('hidden');
-      answersArea.classList.add('hidden');
-      scoreText.textContent = `Your Score: ${score} / ${quizData.length}`;
+    prevBtn.onclick = () => {
+      if(current === 0) return;
+      // user going back: decrement current and do NOT change score (score counts only final selections)
+      // To simplify, we will NOT recompute score backwards — best UX: restart to retake.
+      current--;
+      renderQuestion();
+    };
+
+    function updateProgress(){
+      const pct = Math.round((current/quizData.length)*100);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = `Question ${Math.min(current+1, quizData.length)} / ${quizData.length}`;
     }
 
-    document.getElementById('show-answers').onclick = () => {
-      answersArea.innerHTML = '';
-      quizData.forEach((q, idx) => {
-        const div = document.createElement('div');
-        div.innerHTML = `<strong>Q${idx+1}:</strong> ${q.q}<br><strong>Answer:</strong> ${q.a[q.c]}<hr class='my-2 border-white/20'>`;
-        answersArea.appendChild(div);
-      });
-      answersArea.classList.toggle('hidden');
-    };
+    function showResult(){
+      quiz.style.display = 'none';
+      result.style.display = 'block';
+      scoreText.textContent = `Your Score: ${score} / ${quizData.length}`;
+      answersList.style.display = 'none';
+      answersList.innerHTML = '';
+      showAnswersBtn.onclick = toggleAnswers;
+      restartBtn.onclick = restartQuiz;
+      updateProgressFull();
+      // scroll to results smoothly
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-    document.getElementById('restart').onclick = startQuiz;
+    function toggleAnswers(){
+      if(answersList.style.display === 'none'){
+        answersList.innerHTML = '';
+        quizData.forEach((q, idx) => {
+          const wrap = document.createElement('div');
+          wrap.style.marginBottom = '10px';
+          const ans = document.createElement('div');
+          ans.innerHTML = `<strong>Q${idx+1}:</strong> ${q.q}<br><strong>Answer:</strong> ${q.a[q.c]}`;
+          wrap.appendChild(ans);
+          answersList.appendChild(wrap);
+        });
+        answersList.style.display = 'block';
+        showAnswersBtn.textContent = 'Hide Answers';
+      } else {
+        answersList.style.display = 'none';
+        showAnswersBtn.textContent = 'Show All Answers';
+      }
+    }
+
+    function restartQuiz(){
+      // reset
+      current = 0; score = 0; selectedIndex = null;
+      result.style.display = 'none';
+      intro.style.display = 'block';
+      quiz.style.display = 'none';
+      answersList.style.display = 'none';
+      progressBar.style.width = '0%';
+    }
+
+    function updateProgressFull(){
+      progressBar.style.width = '100%';
+      progressText.textContent = `Completed — ${quizData.length} questions`;
+    }
+
+    // disable text selection of buttons for cleaner UX
+    document.addEventListener('mousedown', e => {
+      if(e.target.classList && e.target.classList.contains('opt-btn')) e.preventDefault();
+    });
   </script>
-
 </body>
 </html>
